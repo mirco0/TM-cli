@@ -78,7 +78,7 @@ expression* parse_statement(token_list* tokens,size_t *start){
     }
 
     if(PEEK_TYPE != IDENTIFIER && PEEK_TYPE != SIGMA && PEEK_TYPE != INSTRUCTION_START && PEEK_TYPE != -1){
-        printf("Unexpected token: '%s'.\n",token_to_string(peek(tokens, *start)));
+        printf("Unexpected token: '%s'.\n",error_token_to_string(peek(tokens, *start)));
         return 0;
     }
 
@@ -93,7 +93,7 @@ expression* parse_assignment(token_list* tokens,size_t* start){
 
     token tk;
     if(!MATCH(&tk,IDENTIFIER,SIGMA)){
-        printf("IDENTIFIER or '\\Sigma' expected but got %s.\n",token_to_string(&tk));
+        print_parser_error("IDENTIFIER or '\\Sigma'",tk);
         return 0;
     }
     sexp->type = VARIABLE;
@@ -107,7 +107,7 @@ expression* parse_assignment(token_list* tokens,size_t* start){
     exp->binary.left = sexp;
     
     if(!MATCH(&tk,ASSIGN)){
-        printf("'=' expected but got %s.\n",token_to_string(&tk));
+        print_parser_error("'='",tk);
         return 0;
     }
 
@@ -119,63 +119,63 @@ expression* parse_assignment(token_list* tokens,size_t* start){
 expression* parse_instruction(token_list* tokens,size_t* start){
     token tk;
     if(!MATCH(&tk,INSTRUCTION_START)){
-        printf("Expected '<' but got %s\n",token_to_string(&tk));
+        print_parser_error("'<'",tk);
         return 0;
     }
 
     if(!MATCH(&tk,IDENTIFIER)){
-        printf("Expected IDENTIFIER but got %s\n",token_to_string(&tk));
+        print_parser_error("IDENTIFIER",tk);
         return 0;
     }
     char* state = tk.data;
 
     if(!MATCH(&tk,COMMA)){
-        printf("Expected ',' but got %s\n",token_to_string(&tk));
+        print_parser_error("','",tk);
         return 0;
     }
     
     if(!MATCH(&tk,IDENTIFIER,BLANK)){
-        printf("Expected IDENTIFIER or BLANK but got %s\n",token_to_string(&tk));
+        print_parser_error("IDENTIFIER or BLANK",tk);
         return 0;
     }
     char* read = tk.data;
 
     if(!MATCH(&tk,COMMA)){
-        printf("Expected ',' but got %s\n",token_to_string(&tk));
+        print_parser_error("','",tk);
         return 0;
     }
     
     if(!MATCH(&tk,IDENTIFIER,BLANK)){
-        printf("Expected IDENTIFIER or BLANK but got %s\n",token_to_string(&tk));
+        print_parser_error("IDENTIFIER or BLANK",tk);
         return 0;
     }
     char* write = tk.data;
 
     if(!MATCH(&tk,COMMA)){
-        printf("Expected ',' but got %s\n",token_to_string(&tk));
+        print_parser_error("','",tk);
         return 0;
     }
     
     if(!MATCH(&tk,IDENTIFIER)){
-        printf("Expected IDENTIFIER but got %s\n",token_to_string(&tk));
+        print_parser_error("IDENTIFIER",tk);
         return 0;
     }
     char* state2 = tk.data;
 
 
     if(!MATCH(&tk,COMMA)){
-        printf("Expected ',' but got %s\n",token_to_string(&tk));
+        print_parser_error("','",tk);
         return 0;
     }
     
     if(!MATCH(&tk,IDENTIFIER)){
-        printf("Expected IDENTIFIER but got %s\n",token_to_string(&tk));
+        print_parser_error("INDENTIFIER",tk);
         return 0;
     }
     char* move = tk.data;
 
     if(!MATCH(&tk,INSTRUCTION_END)){
-        printf("Expected '>' but got %s\n",token_to_string(&tk));
+        print_parser_error("'>'",tk);
         return 0;
     }
 
@@ -203,10 +203,11 @@ expression* parse_set_op(token_list* tokens, size_t* start) {
 expression* parse_set_difference(token_list* tokens, size_t* start){
     expression* exp = parse_set_union(tokens,start);
     
-    expression* exp2 = exp;
     token tk;
     while(PEEK_TYPE == SET_DIFFERENCE){
         tk = *consume(tokens,start);
+        
+        expression* exp2 = exp;
         expression* right = parse_set_union(tokens,start);
         
         exp = calloc(1,sizeof(expression));
@@ -223,10 +224,11 @@ expression* parse_set_difference(token_list* tokens, size_t* start){
 expression* parse_set_union(token_list* tokens, size_t* start){
     expression* exp = parse_set_intersection(tokens,start);
     
-    expression* exp2 = exp;
     token tk;
     while(PEEK_TYPE == SET_UNION){
         tk = *consume(tokens,start);
+
+        expression* exp2 = exp;
         expression* right = parse_set_intersection(tokens,start);
         
         exp = calloc(1,sizeof(expression));
@@ -243,11 +245,11 @@ expression* parse_set_union(token_list* tokens, size_t* start){
 expression* parse_set_intersection(token_list* tokens, size_t* start){
     expression* exp = parse_set_elements(tokens,start);
     
-    expression* exp2 = exp;
-    
     token tk;
     while(PEEK_TYPE == SET_INTERSECTION){
         tk = *consume(tokens,start);
+        
+        expression* exp2 = exp;
         expression* right = parse_set_elements(tokens,start);
         
         exp = calloc(1,sizeof(expression));
@@ -286,13 +288,13 @@ expression* parse_set_elements(token_list* tokens, size_t* start){
     }
 
     if(tk.type != SET_START){
-        printf("Expected '\\{' but got %s\n",token_to_string(&tk));
+        print_parser_error("'\\{",tk);
         return 0;
     }
     tk = *consume(tokens,start);
 
     if(tk.type != IDENTIFIER && tk.type != BLANK){
-        printf("Expected IDENTIFIER or BLANK after '{' but got %s\n",token_to_string(&tk));
+        print_parser_error("IDENTIFIER or BLANK after '\\{'",tk);
         return 0;
     }
     
@@ -302,12 +304,13 @@ expression* parse_set_elements(token_list* tokens, size_t* start){
         if(MATCH(&tk,IDENTIFIER,BLANK)){
             set_insert(s,tk.data, tk.data_size);
         }else{
-            printf("No IDENTIFIER or blank after ',' %s.\n",token_to_string(&tk));
+            //Messaggio precedente "No IDENTIFIER or blank after ',', got %s"
+            print_parser_error("IDENTIFIER or blank after ','", tk);
             return 0;
         }
     }
     if(tk.type != SET_END){
-        printf("Expected '\\}' but got %s\n",token_to_string(&tk));
+        print_parser_error("'\\}'",tk);
         return 0;
     }
 
@@ -319,7 +322,8 @@ expression* parse_set_elements(token_list* tokens, size_t* start){
 expression* parse_domain(token_list* tokens, size_t* start){
     token tk;
     if(!MATCH(&tk,FORALL)){
-        printf("Expected '\\forall' but got %s!.\n",token_to_string(&tk));
+        print_parser_error("\\forall",tk);
+        exit(0);
         return 0;
     }
     
@@ -330,7 +334,8 @@ expression* parse_domain(token_list* tokens, size_t* start){
     exp->binary.left = parse_variables(tokens,start);
 
     if(!MATCH(&tk,IN)){
-        printf("Expected '\\in' but got %s.\n",token_to_string(&tk));
+        print_parser_error("'\\in'",tk);
+        exit(0);
         return 0;
     }
     exp->binary.right = parse_set_op(tokens,start);;
@@ -344,7 +349,8 @@ expression* parse_variables(token_list* tokens, size_t* start){
     token tk;
 
     if(!MATCH(&tk,IDENTIFIER)) {
-        printf("Expected IDENTIFIER but got %s.\n",token_to_string(&tk));
+        print_parser_error("IDENTIFIER",tk);
+        exit(0);
         return 0;
     }
     
@@ -359,4 +365,11 @@ expression* parse_variables(token_list* tokens, size_t* start){
     exp->type = LITERAL;
     exp->literal = *s;
     return exp;
+}
+
+
+void print_parser_error(char* expected, token tk){
+    char* file_name = "Program.tm";
+    printf("%s%s %d:%d %s Expected %s but got %.*s.\n","\e[1;37m",file_name,tk.line_num,tk.char_num,"\x1b[0m",expected,(int)tk.data_size,tk.data);
+    exit(1);
 }
