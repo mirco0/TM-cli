@@ -57,7 +57,7 @@ char* error_token_to_string(const token* token_item){
         ANSI_COLOR_RESET,
         token_item->line_num +1,
         token_item->char_num,
-        token_item->data
+        token_item->data_size ? token_item->data : TOKEN_TYPES_[token_item->type]
     );
     return str;
 }

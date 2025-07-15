@@ -7,7 +7,7 @@
 TODO: includere le parentesi per l'operazione tra insiemi
 */
 int tokenize(char* string, int string_size, token_list** list){
-    int line = 0;
+    int line = 1;
     if(*list == 0) token_list_create(list);
     int i = 0;
     while(i < string_size && string[i] != '\0'){

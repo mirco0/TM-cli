@@ -78,7 +78,7 @@ expression* parse_statement(token_list* tokens,size_t *start){
     }
 
     if(PEEK_TYPE != IDENTIFIER && PEEK_TYPE != SIGMA && PEEK_TYPE != INSTRUCTION_START && PEEK_TYPE != -1){
-        printf("Unexpected token: '%s'.\n",error_token_to_string(peek(tokens, *start)));
+        printf("Unexpected token: '%s'.\n",token_to_string(peek(tokens, *start)));
         return 0;
     }
 
