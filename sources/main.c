@@ -14,7 +14,6 @@ int main(){
     token_list *tokens = 0;
     parsing_info* info = malloc(sizeof(parsing_info));
     info->line = 1;
-    info->ch = 1;
 
     //TODO FIX
     while ((len = fread(str, 1, sizeof(str) - 1, fptr)) > 0) {
