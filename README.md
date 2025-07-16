@@ -8,9 +8,9 @@ This project aims to parse and execute code written for Turing Machines with a s
 
 $$ 
 \begin{align*}
-& \Sigma = \{1,2,3,4\}\\
-& A = \{2\}\\
-& <q_0,x,x,q_1,Right> \forall x \in \Sigma - A
+& \Sigma = \\{1,2,3,4\\}\\
+& A = \\{2\\}\\
+& \langle q_0,x,x,q_1,Right \rangle \forall x \in \Sigma - A
 \end{align*}
 $$
 
