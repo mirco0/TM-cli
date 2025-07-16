@@ -1,5 +1,6 @@
 #include "../headers/parser/parser.h"
 #include "../headers/token.h"
+#include "../headers/utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -93,7 +94,7 @@ expression* parse_assignment(token_list* tokens,size_t* start){
 
     token tk;
     if(!MATCH(&tk,IDENTIFIER,SIGMA)){
-        print_parser_error("IDENTIFIER or '\\Sigma'",tk);
+        print_parser_error("IDENTIFIER or '\\Sigma'",&tk);
         return 0;
     }
     sexp->type = VARIABLE;
@@ -107,7 +108,7 @@ expression* parse_assignment(token_list* tokens,size_t* start){
     exp->binary.left = sexp;
     
     if(!MATCH(&tk,ASSIGN)){
-        print_parser_error("'='",tk);
+        print_parser_error("'='",&tk);
         return 0;
     }
 
@@ -119,63 +120,63 @@ expression* parse_assignment(token_list* tokens,size_t* start){
 expression* parse_instruction(token_list* tokens,size_t* start){
     token tk;
     if(!MATCH(&tk,INSTRUCTION_START)){
-        print_parser_error("'<'",tk);
+        print_parser_error("'<'",&tk);
         return 0;
     }
 
     if(!MATCH(&tk,IDENTIFIER)){
-        print_parser_error("IDENTIFIER",tk);
+        print_parser_error("IDENTIFIER",&tk);
         return 0;
     }
     char* state = tk.data;
 
     if(!MATCH(&tk,COMMA)){
-        print_parser_error("','",tk);
+        print_parser_error("','",&tk);
         return 0;
     }
     
     if(!MATCH(&tk,IDENTIFIER,BLANK)){
-        print_parser_error("IDENTIFIER or BLANK",tk);
+        print_parser_error("IDENTIFIER or BLANK",&tk);
         return 0;
     }
     char* read = tk.data;
 
     if(!MATCH(&tk,COMMA)){
-        print_parser_error("','",tk);
+        print_parser_error("','",&tk);
         return 0;
     }
     
     if(!MATCH(&tk,IDENTIFIER,BLANK)){
-        print_parser_error("IDENTIFIER or BLANK",tk);
+        print_parser_error("IDENTIFIER or BLANK",&tk);
         return 0;
     }
     char* write = tk.data;
 
     if(!MATCH(&tk,COMMA)){
-        print_parser_error("','",tk);
+        print_parser_error("','",&tk);
         return 0;
     }
     
     if(!MATCH(&tk,IDENTIFIER)){
-        print_parser_error("IDENTIFIER",tk);
+        print_parser_error("IDENTIFIER",&tk);
         return 0;
     }
     char* state2 = tk.data;
 
 
     if(!MATCH(&tk,COMMA)){
-        print_parser_error("','",tk);
+        print_parser_error("','",&tk);
         return 0;
     }
     
     if(!MATCH(&tk,IDENTIFIER)){
-        print_parser_error("INDENTIFIER",tk);
+        print_parser_error("INDENTIFIER",&tk);
         return 0;
     }
     char* move = tk.data;
 
     if(!MATCH(&tk,INSTRUCTION_END)){
-        print_parser_error("'>'",tk);
+        print_parser_error("'>'",&tk);
         return 0;
     }
 
@@ -288,13 +289,13 @@ expression* parse_set_elements(token_list* tokens, size_t* start){
     }
 
     if(tk.type != SET_START){
-        print_parser_error("'\\{",tk);
+        print_parser_error("'\\{",&tk);
         return 0;
     }
     tk = *consume(tokens,start);
 
     if(tk.type != IDENTIFIER && tk.type != BLANK){
-        print_parser_error("IDENTIFIER or BLANK after '\\{'",tk);
+        print_parser_error("IDENTIFIER or BLANK after '\\{'",&tk);
         return 0;
     }
     
@@ -305,12 +306,13 @@ expression* parse_set_elements(token_list* tokens, size_t* start){
             set_insert(s,tk.data, tk.data_size);
         }else{
             //Messaggio precedente "No IDENTIFIER or blank after ',', got %s"
-            print_parser_error("IDENTIFIER or blank after ','", tk);
+            print_parser_error("IDENTIFIER or blank after ','", &tk);
             return 0;
         }
     }
     if(tk.type != SET_END){
-        print_parser_error("'\\}'",tk);
+
+        print_parser_error("'\\}'",&tk);
         return 0;
     }
 
@@ -322,7 +324,7 @@ expression* parse_set_elements(token_list* tokens, size_t* start){
 expression* parse_domain(token_list* tokens, size_t* start){
     token tk;
     if(!MATCH(&tk,FORALL)){
-        print_parser_error("\\forall",tk);
+        print_parser_error("\\forall",&tk);
         exit(0);
         return 0;
     }
@@ -334,7 +336,7 @@ expression* parse_domain(token_list* tokens, size_t* start){
     exp->binary.left = parse_variables(tokens,start);
 
     if(!MATCH(&tk,IN)){
-        print_parser_error("'\\in'",tk);
+        print_parser_error("'\\in'",&tk);
         exit(0);
         return 0;
     }
@@ -349,7 +351,7 @@ expression* parse_variables(token_list* tokens, size_t* start){
     token tk;
 
     if(!MATCH(&tk,IDENTIFIER)) {
-        print_parser_error("IDENTIFIER",tk);
+        print_parser_error("IDENTIFIER",&tk);
         exit(0);
         return 0;
     }
@@ -368,8 +370,8 @@ expression* parse_variables(token_list* tokens, size_t* start){
 }
 
 
-void print_parser_error(char* expected, token tk){
+void print_parser_error(char* expected, const token* tk){
     char* file_name = "Program.tm";
-    printf("%s%s %d:%d %s Expected %s but got %.*s.\n","\e[1;37m",file_name,tk.line_num,tk.char_num,"\x1b[0m",expected,(int)tk.data_size,tk.data);
+    printf("%s%s:%d:%d %s Expected %s but got %s.\n",ANSI_BOLD,file_name,tk->line_num,tk->char_num,ANSI_COLOR_RESET,expected,tk->data_size? tk->data: TOKEN_TYPES_[tk->type]);
     exit(1);
 }
