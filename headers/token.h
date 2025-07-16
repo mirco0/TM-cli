@@ -4,6 +4,7 @@
 #include <stdio.h>
 #define MAX_TOKEN_LEN 10
 
+extern const char* TOKEN_TYPES_[];
 enum TOKEN_TYPE {
     INSTRUCTION_START,
     INSTRUCTION_END,
@@ -26,6 +27,11 @@ enum TOKEN_TYPE {
     BLANK
 
 };
+
+typedef struct {
+    int line;
+    int real_char_index;
+} parsing_info;
 
 typedef struct {
     enum TOKEN_TYPE type;

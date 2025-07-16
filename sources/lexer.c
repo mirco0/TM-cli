@@ -6,17 +6,18 @@
 /*
 TODO: includere le parentesi per l'operazione tra insiemi
 */
-int tokenize(char* string, int string_size, token_list** list){
-    int line = 1;
+int tokenize(char* string, int string_size, token_list** list, parsing_info* info){
     if(*list == 0) token_list_create(list);
     int i = 0;
     while(i < string_size && string[i] != '\0'){
-        i = insert_next_token(string, i, string_size, &line, i, *list);
+        int new_pos = insert_next_token(string, i, string_size, *list,info); 
+        info->real_char_index += new_pos - i;
+        i = new_pos;
     }
     return 1;
 }
 
-int insert_next_token(char* string, int start_position, int string_size, int* line, int ch, token_list *list){
+int insert_next_token(char* string, int start_position, int string_size, token_list *list, parsing_info* info){
     char identifier_name[MAX_VAR_NAME] = {0};
     int k = 0;
 
@@ -24,14 +25,14 @@ int insert_next_token(char* string, int start_position, int string_size, int* li
 
         char c = string[i++];
         switch (c) {
-            case '\n':  (*line)++; return i;
-            case '<':   add_token(INSTRUCTION_START,0,0,*line,i,list); return i;
-            case '>':   add_token(INSTRUCTION_END  ,0,0,*line,i,list); return i;
-            case ',':   add_token(COMMA            ,0,0,*line,i,list); return i;
-            case '=':   add_token(ASSIGN           ,0,0,*line,i,list); return i;
-            case '-':   add_token(SET_DIFFERENCE   ,0,0,*line,i,list); return i;
-            case '(':   add_token(OPEN_PARENTESIS  ,0,0,*line,i,list); return i;
-            case ')':   add_token(CLOSE_PARENTESIS ,0,0,*line,i,list); return i;
+            case '\n':  info->line++; info->real_char_index = -1; return i;
+            case '<':   add_token(INSTRUCTION_START,0,0,list,info); return i;
+            case '>':   add_token(INSTRUCTION_END  ,0,0,list,info); return i;
+            case ',':   add_token(COMMA            ,0,0,list,info); return i;
+            case '=':   add_token(ASSIGN           ,0,0,list,info); return i;
+            case '-':   add_token(SET_DIFFERENCE   ,0,0,list,info); return i;
+            case '(':   add_token(OPEN_PARENTESIS  ,0,0,list,info); return i;
+            case ')':   add_token(CLOSE_PARENTESIS ,0,0,list,info); return i;
             //Ignora spazi vuoti
             case ' ':
             case '\r':
@@ -39,11 +40,11 @@ int insert_next_token(char* string, int start_position, int string_size, int* li
                 return i;
             case '\\':
                     if(string[i] == '{'){
-                        add_token(SET_START,0,0,*line,i,list); return i+1;
+                        add_token(SET_START,0,0,list,info); return i+1;
                     }
                     
                     if(string[i] == '}'){
-                        add_token(SET_END,0,0,*line,i,list); return i+1;
+                        add_token(SET_END,0,0,list,info); return i+1;
                     } 
 
             default:
@@ -58,16 +59,16 @@ int insert_next_token(char* string, int start_position, int string_size, int* li
                     
                     //BLANK CON DATI
                     if(identifier == BLANK){
-                        add_token(identifier,"\t",2,*line,i,list);
+                        add_token(identifier,"\t",2,list,info);
                     }else{
-                        add_token(identifier,0,0,*line,i,list);
+                        add_token(identifier,0,0,list,info);
                     }
 
                 }else{
                     k++;
                     char* str = malloc(sizeof(char)*(k));
                     strncpy(str,identifier_name,k);
-                    add_token(IDENTIFIER,str,k,*line,i,list);
+                    add_token(IDENTIFIER,str,k,list,info);
                 }
         }
         return i;
@@ -110,8 +111,8 @@ int character(char c) {
            (c >= '0' && c <= '9') ||
             c == '_';
 }
-int add_token(enum TOKEN_TYPE type, char* data, size_t data_size, int line_num, int char_num, token_list* tokens){
-    token_list_add(tokens, (token){type,data,data_size,line_num,char_num});
+int add_token(enum TOKEN_TYPE type, char* data, size_t data_size, token_list* tokens, const parsing_info* info){
+    token_list_add(tokens, (token){type,data,data_size,info->line,info->real_char_index+1});
     return 0;
 }
 
