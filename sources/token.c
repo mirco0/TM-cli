@@ -4,7 +4,7 @@
 #include "../headers/utils.h"
 
 const char* TOKEN_TYPES_[] = {
-
+    "EOF",
     "INSTRUCTION_START",
     "INSTRUCTION_END",
     "COMMA",

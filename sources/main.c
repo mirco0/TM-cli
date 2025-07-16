@@ -14,6 +14,9 @@ int main(){
     token_list *tokens = 0;
     parsing_info* info = malloc(sizeof(parsing_info));
     info->line = 1;
+    info->inline_char_index = 0;
+    info->commented = 0;
+    
 
     //TODO FIX
     while ((len = fread(str, 1, sizeof(str) - 1, fptr)) > 0) {
@@ -31,10 +34,8 @@ int main(){
             str[len] = '\0';
         }
 
-        tokenize(str, 1024,&tokens,info);
-        
+        tokenize(str, 1024,&tokens,info);   
     }
-    
     fclose(fptr);
     print_token_list(tokens);
     expression* exp = parse(tokens);

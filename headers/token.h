@@ -6,6 +6,7 @@
 
 extern const char* TOKEN_TYPES_[];
 enum TOKEN_TYPE {
+    END_OF_FILE,
     INSTRUCTION_START,
     INSTRUCTION_END,
     COMMA,
@@ -30,7 +31,8 @@ enum TOKEN_TYPE {
 
 typedef struct {
     int line;
-    int real_char_index;
+    int inline_char_index;
+    int commented;
 } parsing_info;
 
 typedef struct {

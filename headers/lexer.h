@@ -10,5 +10,6 @@ int insert_next_token(char* string, int start_position, int string_size, token_l
 int get_identifier(char identifier[MAX_VAR_NAME], int var_name_size);
 int add_token(enum TOKEN_TYPE type, char* data, size_t data_size, token_list* tokens, const parsing_info* info);
 int character(char c);
+void write_end(token_list*, const parsing_info* info);
 
 #endif

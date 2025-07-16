@@ -22,6 +22,7 @@ The parser is almost complete, but some features are still missing:
 - [x] **Quantified instructions** with `\forall x \in ...`
 - [x] **Automatic instruction expansion** from symbolic domains
 - [x] **Comment support** via `#`
+- [x] Comment support at end-of-line (inline)
 
 - [ ] Turing Machine execution engine
 
@@ -31,7 +32,6 @@ The parser is almost complete, but some features are still missing:
 
 - [ ] Better error reporting and diagnostics
 
-- [ ] Comment support at end-of-line (inline)
 
 ## Formal Grammar
 The formal grammar for this project at the moment is:

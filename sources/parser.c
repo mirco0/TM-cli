@@ -78,11 +78,10 @@ expression* parse_statement(token_list* tokens,size_t *start){
         expression_list_add(exp_list,parse_instruction(tokens,start));
     }
 
-    if(PEEK_TYPE != IDENTIFIER && PEEK_TYPE != SIGMA && PEEK_TYPE != INSTRUCTION_START && PEEK_TYPE != -1){
+    if(PEEK_TYPE != IDENTIFIER && PEEK_TYPE != SIGMA && PEEK_TYPE != INSTRUCTION_START && PEEK_TYPE != -1 && PEEK_TYPE != END_OF_FILE){
         printf("Unexpected token: '%s'.\n",token_to_string(peek(tokens, *start)));
         return 0;
     }
-
     exp->program = *exp_list;
     return exp;
 }
@@ -289,7 +288,7 @@ expression* parse_set_elements(token_list* tokens, size_t* start){
     }
 
     if(tk.type != SET_START){
-        print_parser_error("'\\{",&tk);
+        print_parser_error("'\\{'",&tk);
         return 0;
     }
     tk = *consume(tokens,start);
