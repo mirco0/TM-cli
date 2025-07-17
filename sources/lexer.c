@@ -47,11 +47,7 @@ int insert_next_token(char* string, int start_position, int string_size, token_l
                     
                     if(string[i] == '}'){
                         add_token(SET_END,0,0,list,info); return i+1;
-                    } 
-
-            case 'R':
-            case 'L':
-            case 'S':
+                    }
             default:
                 identifier_name[k++] = c;
                 while(i<string_size && string[i] != '\0' && character(string[i])){

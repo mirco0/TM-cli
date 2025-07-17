@@ -25,7 +25,7 @@ typedef struct instruction {
     char* read;
     char* write;
     char* state2;
-    char* move;
+    enum TOKEN_TYPE move;
     struct expression* quantifier;
 } instruction_expression;
 

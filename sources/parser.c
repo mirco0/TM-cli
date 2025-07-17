@@ -172,7 +172,7 @@ expression* parse_instruction(token_list* tokens,size_t* start){
         print_parser_error("'Left', 'Stop' or 'Right'",&tk);
         return 0;
     }
-    char* move = tk.data;
+    enum TOKEN_TYPE move = tk.type;
 
     if(!MATCH(&tk,INSTRUCTION_END)){
         print_parser_error("'>'",&tk);

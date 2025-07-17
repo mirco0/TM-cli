@@ -29,7 +29,7 @@ char* expression_to_string(const expression* exp, int indent){
                 exp->instruction.read,
                 exp->instruction.write,
                 exp->instruction.state2,
-                exp->instruction.move,
+                TOKEN_TYPES_[exp->instruction.move],
                 inner_indent_str,
                 expression_to_string(exp->instruction.quantifier,indent+1)
             );
