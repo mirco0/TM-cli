@@ -371,6 +371,18 @@ expression* parse_variables(token_list* tokens, size_t* start){
 
 void print_parser_error(char* expected, const token* tk){
     char* file_name = "Program.tm";
-    printf("%s%s:%d:%d %s Expected %s but got %s.\n",ANSI_BOLD,file_name,tk->line_num,tk->char_num,ANSI_COLOR_RESET,expected,tk->data_size? tk->data: TOKEN_TYPES_[tk->type]);
+    printf("%s%sError%s in file %s%s:%d:%d%s:\nExpected %s but got '%s%s%s'\n",
+        ANSI_BOLD,
+        ANSI_COLOR_RED,
+        ANSI_COLOR_RESET,
+        ANSI_BOLD,
+        file_name,
+        tk->line_num, 
+        tk->char_num,
+        ANSI_COLOR_RESET,
+        expected,
+        ANSI_COLOR_CYAN,
+        tk->data_size? tk->data: TOKEN_TYPES_[tk->type],
+        ANSI_COLOR_RESET);
     exit(1);
 }

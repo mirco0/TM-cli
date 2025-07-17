@@ -12,10 +12,8 @@ int main(){
     size_t len;
 
     token_list *tokens = 0;
-    parsing_info* info = malloc(sizeof(parsing_info));
-    info->line = 1;
-    info->inline_char_index = 0;
-    info->commented = 0;
+    lexing_info* info = 0;
+    create_lexing_info(&info);
     
 
     //TODO FIX
@@ -36,6 +34,7 @@ int main(){
 
         tokenize(str, 1024,&tokens,info);   
     }
+    write_end(tokens,info);
     fclose(fptr);
     print_token_list(tokens);
     expression* exp = parse(tokens);

@@ -30,17 +30,12 @@ enum TOKEN_TYPE {
 };
 
 typedef struct {
-    int line;
-    int inline_char_index;
-    int commented;
-} parsing_info;
-
-typedef struct {
     enum TOKEN_TYPE type;
     char* data;
     size_t data_size;
     int line_num;
     int char_num;
+    size_t real_char_num;
 } token;
 
 char* token_to_string(const token*);
