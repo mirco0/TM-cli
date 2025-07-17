@@ -168,7 +168,7 @@ expression* parse_instruction(token_list* tokens,size_t* start){
         return 0;
     }
     
-    if(!MATCH(&tk,ACTION_LEFT,ACTION_STOP,ACTION_RIGTH)){
+    if(!MATCH(&tk,ACTION_LEFT,ACTION_STOP,ACTION_RIGHT)){
         print_parser_error("'Left', 'Stop' or 'Right'",&tk);
         return 0;
     }

@@ -17,7 +17,7 @@ const char* TOKEN_TYPES_[] = {
 
     "ACTION_LEFT",
     "ACTION_STOP",
-    "ACTION_RIGTH",
+    "ACTION_RIGHT",
 
     "IDENTIFIER",
     "STRING",

@@ -96,7 +96,7 @@ int get_identifier(char identifier[MAX_VAR_NAME], int var_name_size){
                 return SET_INTERSECTION;
         case 5:
             if(strncmp(identifier,"Right", MAX_VAR_NAME) == 0)
-                return ACTION_RIGTH;
+                return ACTION_RIGHT;
             
         case 6:
             if(strncmp(identifier,"\\Sigma", MAX_VAR_NAME) == 0)
