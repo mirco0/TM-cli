@@ -14,7 +14,7 @@
 program           → statement
 statement         → (assignment | instruction)*
 
-instruction       → "<" ID (","ID){4} ">" (domain)?
+instruction       → "<" ID (","ID){3} "," ("Left" | "Stop" | "Right") ">" (domain)?
 assignment        → (IDENTIFIER | \Sigma) "=" set_op
 domain            → "\forall" variables "\in" set_op
 
@@ -24,7 +24,7 @@ set_difference    → set_union ( - set_union)*
 set_union         → set_intersection ( "\cup" set_intersection)*
 set_intersection  → set_elements ( "\cap" set_elements )*
 set_elements      → ( "\{" (IDENTIFIER | "\square") ( "," (IDENTIFIER | "\square") )* "\}" ) | SET
-SET     → \Sigma | IDENTIFIER
+SET               → \Sigma | IDENTIFIER
 */
 
 int match(token_list* tokens, size_t* start, token* dest_token, int count, ...){
@@ -168,8 +168,8 @@ expression* parse_instruction(token_list* tokens,size_t* start){
         return 0;
     }
     
-    if(!MATCH(&tk,IDENTIFIER)){
-        print_parser_error("INDENTIFIER",&tk);
+    if(!MATCH(&tk,ACTION_LEFT,ACTION_STOP,ACTION_RIGTH)){
+        print_parser_error("'Left', 'Stop' or 'Right'",&tk);
         return 0;
     }
     char* move = tk.data;

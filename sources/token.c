@@ -15,6 +15,10 @@ const char* TOKEN_TYPES_[] = {
     "OPEN_PARENTESIS",
     "CLOSE_PARENTESIS",
 
+    "ACTION_LEFT",
+    "ACTION_STOP",
+    "ACTION_RIGTH",
+
     "IDENTIFIER",
     "STRING",
 

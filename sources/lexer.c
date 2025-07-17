@@ -49,6 +49,9 @@ int insert_next_token(char* string, int start_position, int string_size, token_l
                         add_token(SET_END,0,0,list,info); return i+1;
                     } 
 
+            case 'R':
+            case 'L':
+            case 'S':
             default:
                 identifier_name[k++] = c;
                 while(i<string_size && string[i] != '\0' && character(string[i])){
@@ -87,10 +90,18 @@ int get_identifier(char identifier[MAX_VAR_NAME], int var_name_size){
             if(strncmp(identifier,"\\in", MAX_VAR_NAME) == 0)
                 return IN; 
         case 4:
+            if(strncmp(identifier,"Left", MAX_VAR_NAME) == 0)
+                return ACTION_LEFT;
+            if(strncmp(identifier,"Stop", MAX_VAR_NAME) == 0)
+                return ACTION_STOP;
             if(strncmp(identifier,"\\cup", MAX_VAR_NAME) == 0)
                 return SET_UNION;
             if(strncmp(identifier,"\\cap", MAX_VAR_NAME) == 0)
                 return SET_INTERSECTION;
+        case 5:
+            if(strncmp(identifier,"Right", MAX_VAR_NAME) == 0)
+                return ACTION_RIGTH;
+            
         case 6:
             if(strncmp(identifier,"\\Sigma", MAX_VAR_NAME) == 0)
                 return SIGMA;
@@ -99,7 +110,7 @@ int get_identifier(char identifier[MAX_VAR_NAME], int var_name_size){
                 return BLANK;
             if(strncmp(identifier,"\\forall", MAX_VAR_NAME) == 0)
                 return FORALL;
-
+            
         default: return -1;
     }
     
