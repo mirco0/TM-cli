@@ -27,7 +27,7 @@ int insert_next_token(char* string, int start_position, int string_size, token_l
         if(info->commented && c != '\n') return i;
         switch (c) {
             case '\n':  info->line++; info->inline_char_index = -1; info->commented = 0; return i;
-            case '#':   info->commented = 1;                        return i;
+            case '%':   info->commented = 1;                        return i;
             case '<':   add_token(INSTRUCTION_START,0,0,list,info); return i;
             case '>':   add_token(INSTRUCTION_END  ,0,0,list,info); return i;
             case ',':   add_token(COMMA            ,0,0,list,info); return i;

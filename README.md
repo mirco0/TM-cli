@@ -57,11 +57,11 @@ SET               → \Sigma | IDENTIFIER
 ## Example Program
 [Program.tm](Program.tm)
 ```tm
-# Input alphabet 
+% Input alphabet 
 \Sigma = \{1,2,3,4\}
 A = \{2\}
 
-# Instruction using quantified domain
+% Instruction using quantified domain
 <q0, x, x, q1, Right> \forall x \in \Sigma - A
 ```
 Gets expanded to
