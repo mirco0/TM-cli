@@ -38,5 +38,7 @@ int main(){
     fclose(fptr);
     print_token_list(tokens);
     expression* exp = parse(tokens);
+    exp = expression_compress(exp);
+
     printf("%s\n",expression_to_string(exp,1));
 }

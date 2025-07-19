@@ -101,3 +101,31 @@ set* set_difference(const set* a, const set* b){
     }
     return s;
 }
+
+
+set* set_merge_union(set* a, set* b){
+    set* s = set_union(a,b);
+    free_set_content(a);
+    free_set_content(b);
+    return s;
+}
+
+set* set_merge_intersection(set* a, set* b){
+    set* s = set_intersection(a,b);
+    free_set_content(a);
+    free_set_content(b);
+    return s;
+}
+
+set* set_merge_difference(set* a, set* b){
+    set* s = set_difference(a,b);
+    free_set_content(a);
+    free_set_content(b);
+    return s;
+}
+
+void free_set_content(set *set){
+    free(set->data->data);
+    free(set->data);
+    // free(set);
+}

@@ -9,7 +9,6 @@ void print_expression(const expression* exp){
 
 //TODO: RISCRIVERE
 char* expression_to_string(const expression* exp, int indent){
-    
     char* str = malloc(sizeof(char)*1000);
     if(exp == NULL){
         asprintf(&str,"Empty expression.");
@@ -86,4 +85,64 @@ char* expression_to_string(const expression* exp, int indent){
 
     return str;
 
+}
+
+expression* expression_binary_simplify(expression* exp){
+    if(exp == NULL) return exp;
+    if(exp->binary.left->type == exp->binary.right->type && exp->binary.left->type != LITERAL)
+        return exp;
+
+    expression *new_exp = calloc(1, sizeof(expression));
+    new_exp->type = LITERAL;
+    set* result;
+
+    switch (exp->binary.operator.type) {
+        case SET_INTERSECTION:
+            result = set_merge_intersection(&exp->binary.left->literal,&exp->binary.right->literal);
+            new_exp->literal = *result;
+            free(result);
+            free(exp);
+            return new_exp;
+            break;
+        
+        case SET_UNION:
+            result = set_merge_union(&exp->binary.left->literal,&exp->binary.right->literal);
+            new_exp->literal = *result;
+            free(result);
+            free(exp);
+            return new_exp;
+
+        case SET_DIFFERENCE:
+            result = set_merge_difference(&exp->binary.left->literal,&exp->binary.right->literal);
+            new_exp->literal = *result;
+            free(result);
+            free(exp);
+            return new_exp;
+        
+        default: return exp;
+    }
+    return 0;
+}
+
+expression* expression_compress(expression* exp){
+
+    if(exp == NULL) return exp;
+    switch (exp->type) {
+        case PROGRAM:
+            for(int i = 0; i<exp->program.index; i++){
+                exp->program.data[i] = expression_compress(exp->program.data[i]);
+            }
+            return exp;
+            break;
+        case BINARY:
+            exp->binary.left = expression_compress(exp->binary.left);
+            exp->binary.right = expression_compress(exp->binary.right);
+            exp = expression_binary_simplify(exp);
+            return exp;
+            
+        case INSTRUCTION:
+            exp->instruction.quantifier = expression_compress(exp->instruction.quantifier);
+        default: return exp;
+    }
+    return exp;
 }

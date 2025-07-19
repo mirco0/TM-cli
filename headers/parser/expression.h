@@ -54,6 +54,7 @@ typedef struct expression {
 
 void print_expression(const expression* exp);
 char* expression_to_string(const expression* exp,int indent);
+expression* expression_binary_simplify(expression* exp);
 expression* expression_compress(expression* exp);
 expression* expression_define(expression* exp);
 
