@@ -21,7 +21,7 @@ The parser is almost complete, but some features are still missing:
 - [x] **Symbolic sets** like `\Sigma` and named subsets
 - [x] **Quantified instructions** with `\forall x \in ...`
 - [x] **Automatic instruction expansion** from symbolic domains
-- [x] **Comment support** via `#`
+- [x] **Comment support** via `%`
 - [x] Comment support at end-of-line (inline)
 
 - [ ] Turing Machine execution engine
