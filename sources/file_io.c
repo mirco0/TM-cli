@@ -11,8 +11,16 @@ int context_file_open(file_context** context, const char *filename){
     return (*context)->fp != NULL;
 }
 
-string_list* read_all_chunks(file_context context, size_t chunk_size){
+string_list* read_all_chunks(file_context* context, size_t chunk_size){
+    string_list* list;
+    string_list_create(&list);
 
+    char* str = malloc(chunk_size);
+    while(read_next_chunk(context,str,chunk_size)){
+        string_list_add(list,str);
+        str = malloc(chunk_size);
+    }
+    return list;
 }
 
 int read_next_chunk(file_context* context, char* buffer, size_t buffer_size){
