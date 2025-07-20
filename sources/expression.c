@@ -1,14 +1,15 @@
 #include "../headers/parser/expression.h"
+#include "../headers/utils.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include "../headers/utils.h"
 
 void print_expression(const expression* exp){
 
 }
 
 //TODO: RISCRIVERE
-char* expression_to_string(const expression* exp, int indent){
+char* expression_to_string(expression* exp, int indent){
     char* str = malloc(sizeof(char)*1000);
     if(exp == NULL){
         asprintf(&str,"Empty expression.");
@@ -59,7 +60,7 @@ char* expression_to_string(const expression* exp, int indent){
             return str;
 
         case LITERAL:
-            char* set_str = set_to_string(&exp->literal); 
+            char* set_str = set_to_string(exp->literal); 
             asprintf(&str,"%sLiteral%s %s",
                 ANSI_COLOR_MAGENTA,
                 ANSI_COLOR_RESET,
@@ -109,24 +110,21 @@ expression* expression_binary_simplify(expression* exp){
 
     switch (exp->binary.operator.type) {
         case SET_INTERSECTION:
-            result = set_merge_intersection(&exp->binary.left->literal,&exp->binary.right->literal);
-            new_exp->literal = *result;
-            free(result);
+            result = set_merge_intersection(exp->binary.left->literal,exp->binary.right->literal);
+            new_exp->literal = result;
             free(exp);
             return new_exp;
             break;
         
         case SET_UNION:
-            result = set_merge_union(&exp->binary.left->literal,&exp->binary.right->literal);
-            new_exp->literal = *result;
-            free(result);
+            result = set_merge_union(exp->binary.left->literal,exp->binary.right->literal);
+            new_exp->literal = result;
             free(exp);
             return new_exp;
 
         case SET_DIFFERENCE:
-            result = set_merge_difference(&exp->binary.left->literal,&exp->binary.right->literal);
-            new_exp->literal = *result;
-            free(result);
+            result = set_merge_difference(exp->binary.left->literal,exp->binary.right->literal);
+            new_exp->literal = result;
             free(exp);
             return new_exp;
         

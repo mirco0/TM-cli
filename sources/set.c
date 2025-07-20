@@ -1,131 +1,134 @@
 #include "../headers/set.h"
-
+#include "../headers/hashtable.h"
+#include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
+//Valore per identificare l'elemento presente
+static void* EXISTS = (void*)1;
+
 set* create_set(){
-    set* s = calloc(1,sizeof(set));
-    string_list_create(&s->data); 
-    s->data_length = -1;
-    // FIXED LENGTH TO MAX_ELEMENT_SIZE
-    s->data_length = MAX_ELEMENT_SIZE+1;
-    
-    return s;
-};
-
-int set_insert(set* s, char* data, size_t size){
-    if(s->data_length == -1){
-        s->data_length = size;
-    }
-    
-    if(size != s->data_length){
-        return 0;
-    }
-
-    string_list_add(s->data,data);
-    return 1;
+    return ht_create();
 }
 
-char* set_to_string(const set* s){
-    // Ogni stringa è data_length di lunghezza +2 per " ,"
-    size_t size = sizeof(char)*( (s->data_length+2)*(s->data->index)+1);
-    char* str = malloc(size);
-
-    int written = 0;
-    for(size_t i = 0; i<s->data->index; i++){
-        written += snprintf(
-            str + written,
-            size - written,
-            (i < s->data->index - 1) ? "%.*s, " : "%.*s",
-            (int)s->data_length,
-            s->data->data[i]);
-    }
-    return str;
-}
-
-int set_contains(const set* s, const char* element, size_t size){
-    for(size_t i = 0; i<s->data->index; i++){
-        if(strncmp(s->data->data[i],element,size) == 0) return 1;
-    }
+int set_insert(set *s, char *data){
+    ht_set(s,data,EXISTS);
     return 0;
 }
 
-set* set_union(const set* a, const set*  b){
-
-    set* s = create_set();
-    if(a->data_length != b->data_length) return s;
-
-    
-    for(size_t i = 0; i<a->data->index; i++){
-        char* elem = a->data->data[i];
-        if(!set_contains(s,elem,b->data_length)){
-            set_insert(s,elem,s->data_length);
-        }
-    }
-
-    for(size_t i = 0; i<b->data->index; i++){
-        char* elem = b->data->data[i];
-        if(!set_contains(s,elem,b->data_length)){
-            set_insert(s,elem,b->data_length);
-        }
-    }
-    return s;
-    
+int set_contains(set *s, const char *element){
+    return ht_get(s,element) == EXISTS;
 }
 
-set* set_intersection(const set* a, const set* b){
-    set* s = create_set();
-    if(a->data_length != b->data_length) return s;
-    
-    s->data_length = a->data_length;
-    for(size_t i = 0; i<a->data->index; i++){
-        char* elem = a->data->data[i];
-        if(set_contains(b,elem,a->data_length)){
-            set_insert(s,elem,a->data_length);
-        }
+set* set_union(set* a, set* b){
+    hti iter_a = ht_iterator(a);
+    hti iter_b = ht_iterator(b);
+    hashtable* ht = ht_create();
+    set* s = malloc(sizeof(set));
+    while(ht_next(&iter_a)){
+        ht_set(ht,iter_a.key,iter_a.value);
     }
+    
+    while(ht_next(&iter_b)){
+        ht_set(ht,iter_b.key,EXISTS);
+    }
+    
+    s = ht;
     return s;
 }
 
-set* set_difference(const set* a, const set* b){
-    set* s = create_set();
-    if(a->data_length != b->data_length) return s;
+set* set_intersection(set* a, set* b){
+    hti iter_a = ht_iterator(a);
+    hti iter_b = ht_iterator(b);
+    hashtable* ht = ht_create();
+    set* s = malloc(sizeof(set));
     
-    for(size_t i = 0; i<a->data->index; i++){
-        char* elem = a->data->data[i];
-        
-        if(!set_contains(b,elem,a->data_length)){
-            set_insert(s,elem,a->data_length);
+    while(ht_next(&iter_a)){
+        if(set_contains(b,iter_a.key)){
+            ht_set(ht,iter_a.key,EXISTS);
         }
     }
+    
+    while(ht_next(&iter_b)){
+        if(set_contains(a,iter_b.key)){
+            ht_set(ht,iter_b.key,EXISTS);
+        }
+    }
+    
+    s = ht;
     return s;
 }
 
+set* set_difference(set* a, set* b){
+    hti iter_a = ht_iterator(a);
+    hashtable* ht = ht_create();
+    set* s = malloc(sizeof(set));
+    
+    while(ht_next(&iter_a)){
+        if(!set_contains(b, iter_a.key)){
+            ht_set(ht,iter_a.key,EXISTS);
+        }
+    }
+
+    s = ht;
+    return s;
+}
+
+char* set_to_string(set* s){
+    if(s == NULL){
+        return NULL;
+    }
+    hti iter_s = ht_iterator(s);
+    size_t total_chars = 0;
+    size_t count = 0;
+
+    while(ht_next(&iter_s)){
+        total_chars += strlen(iter_s.key) + 2;
+        count++;
+}
+
+    char* str = malloc(total_chars + 1);
+    if (str == NULL) {
+        return NULL;
+    }
+
+    size_t written = 0;
+    iter_s = ht_iterator(s);
+    size_t i = 0;
+    while(ht_next(&iter_s)){
+        if (i < count - 1)
+            written += snprintf(str + written, total_chars + 1 - written, "%s, ", iter_s.key);
+        else
+            written += snprintf(str + written, total_chars + 1 - written, "%s", iter_s.key);
+        i++;
+    }
+    return str;
+
+}
 
 set* set_merge_union(set* a, set* b){
-    set* s = set_union(a,b);
-    free_set_content(a);
-    free_set_content(b);
-    return s;
+    hti iter_b = ht_iterator(b);
+    while (ht_next(&iter_b)) {
+        ht_set(a,iter_b.key,EXISTS);
+    }
+    ht_destroy(b);
+    return a;
 }
 
 set* set_merge_intersection(set* a, set* b){
     set* s = set_intersection(a,b);
-    free_set_content(a);
-    free_set_content(b);
+    ht_destroy(a);
+    ht_destroy(b);
     return s;
+    
 }
 
 set* set_merge_difference(set* a, set* b){
     set* s = set_difference(a,b);
-    free_set_content(a);
-    free_set_content(b);
+    ht_destroy(a);
+    ht_destroy(b);
     return s;
+    
 }
 
-void free_set_content(set *set){
-    free(set->data->data);
-    free(set->data);
-    // free(set);
-}
+void free_set_content(set* set);

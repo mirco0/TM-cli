@@ -75,6 +75,11 @@ Gets expanded to
 This project is highly inspired by the course "Fondamenti di informatica" attended at Università di TorVergata and references formal language design and interpreters 
 [Crafting Interpreters](https://craftinginterpreters.com/contents.html)
 
+### Resources
+[Crafting Interpreters](https://craftinginterpreters.com/contents.html)
+
+[HashTables in C](https://benhoyt.com/writings/hash-table-in-c/)
+
 This project is a far from completion and primarily built for learning and experimentation.
 
 ## License

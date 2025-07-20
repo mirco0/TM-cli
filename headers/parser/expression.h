@@ -3,6 +3,7 @@
 
 #include "../token.h"
 #include "../set.h"
+#include "../list.h"
 #include <stdio.h>
 
 typedef enum {
@@ -16,7 +17,7 @@ typedef enum {
 
 /* TIPI DI ESPRESSIONI */
 
-typedef set literal_expression; 
+typedef set* literal_expression; 
 typedef char* variable_expression;
 typedef expression_list program_expression;
 
@@ -53,7 +54,7 @@ typedef struct expression {
 } expression;
 
 void print_expression(const expression* exp);
-char* expression_to_string(const expression* exp,int indent);
+char* expression_to_string(expression* exp,int indent);
 expression* expression_binary_simplify(expression* exp);
 expression* expression_compress(expression* exp);
 expression* expression_define(expression* exp);

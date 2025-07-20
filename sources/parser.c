@@ -277,13 +277,13 @@ expression* parse_set_elements(token_list* tokens, size_t* start){
     
     set* s = create_set();
     if(tk.type == SIGMA){
-        set_insert(s,"S", 2);
-        set_insert(s,"I", 2);
-        set_insert(s,"G", 2);
-        set_insert(s,"M", 2);
-        set_insert(s,"A", 2);
+        set_insert(s,"S");
+        set_insert(s,"I");
+        set_insert(s,"G");
+        set_insert(s,"M");
+        set_insert(s,"A");
         exp->type = LITERAL;
-        exp->literal = *s;
+        exp->literal = s;
         return exp;
     }
 
@@ -298,11 +298,11 @@ expression* parse_set_elements(token_list* tokens, size_t* start){
         return 0;
     }
     
-    set_insert(s,tk.data, tk.data_size);
+    set_insert(s,tk.data);
     
     while(MATCH(&tk,COMMA)) {
         if(MATCH(&tk,IDENTIFIER,BLANK)){
-            set_insert(s,tk.data, tk.data_size);
+            set_insert(s,tk.data);
         }else{
             //Messaggio precedente "No IDENTIFIER or blank after ',', got %s"
             print_parser_error("IDENTIFIER or blank after ','", &tk);
@@ -316,7 +316,7 @@ expression* parse_set_elements(token_list* tokens, size_t* start){
     }
 
     exp->type = LITERAL;
-    exp->literal = *s;
+    exp->literal = s;
     return exp;
 }
 
@@ -355,16 +355,16 @@ expression* parse_variables(token_list* tokens, size_t* start){
         return 0;
     }
     
-    set_insert(s, tk.data,tk.data_size);
+    set_insert(s, tk.data);
     
     while(PEEK_TYPE == COMMA) {
         tk = *consume(tokens,start);
         if(MATCH(&tk,IDENTIFIER)){
-            set_insert(s,tk.data, tk.data_size);
+            set_insert(s,tk.data);
         }
     }
     exp->type = LITERAL;
-    exp->literal = *s;
+    exp->literal = s;
     return exp;
 }
 
