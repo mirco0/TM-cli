@@ -33,6 +33,7 @@ char* expression_to_string(const expression* exp, int indent){
                 expression_to_string(exp->instruction.quantifier,indent+1)
             );
             free(inner_indent_str);
+            free(parent_indent_str);
             return str;
 
         case BINARY:
@@ -50,6 +51,8 @@ char* expression_to_string(const expression* exp, int indent){
                 right_str,
                 parent_indent_str
             );
+            free(inner_indent_str);
+            free(parent_indent_str);
             free(left_str);
             free(oper_str);
             free(right_str);
@@ -62,11 +65,15 @@ char* expression_to_string(const expression* exp, int indent){
                 ANSI_COLOR_RESET,
                 set_str
             );
+            free(inner_indent_str);
+            free(parent_indent_str);
             free(set_str);
             return str;
             
         case VARIABLE:
             asprintf(&str,"%sVariable%s %s",ANSI_COLOR_GREEN,ANSI_COLOR_RESET,exp->variable);
+            free(inner_indent_str);
+            free(parent_indent_str);
             return str;
     
         case PROGRAM:
@@ -75,10 +82,14 @@ char* expression_to_string(const expression* exp, int indent){
             for(size_t i = 0; i<exp->program.index; i++){
                 asprintf(&str,"%s%s\n",str,expression_to_string((exp->program.data[i]),indent));
             }
+            free(inner_indent_str);
+            free(parent_indent_str);
             return str;
 
         default: 
             asprintf(&str,"Unknown expression.");
+            free(inner_indent_str);
+            free(parent_indent_str);
             return str;
         break;
     }
