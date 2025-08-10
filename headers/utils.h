@@ -13,6 +13,7 @@
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 char* repeat(char ch, int repeat);
+void append_str_raw(char** dest, const char* str);
 void append_str(char** dest, const char* fmt, ...);
 
 #endif

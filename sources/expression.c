@@ -99,6 +99,8 @@ char* expression_to_string(expression* exp, int indent){
 
 }
 
+//TODO: Valutare se rimuovere in favore di eval (turing_engine.h)
+//Operazioni di semplificazioni (ottimizzazioni) dell'albero nella fase di parsing 
 expression* expression_binary_simplify(expression* exp){
     if(exp == NULL) return exp;
     if(exp->binary.left->type == exp->binary.right->type && exp->binary.left->type != LITERAL)

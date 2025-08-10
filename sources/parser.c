@@ -100,7 +100,7 @@ expression* parse_assignment(token_list* tokens,size_t* start){
     if(tk.data_size != 0){
         sexp->variable = tk.data;
     }else{
-        sexp->variable = "SIGMA";
+        sexp->variable = "\\Sigma";
     }
 
     exp->type = BINARY;
@@ -274,19 +274,13 @@ expression* parse_set_elements(token_list* tokens, size_t* start){
         return exp;
     }
 
-    
-    set* s = create_set();
     if(tk.type == SIGMA){
-        set_insert(s,"S");
-        set_insert(s,"I");
-        set_insert(s,"G");
-        set_insert(s,"M");
-        set_insert(s,"A");
-        exp->type = LITERAL;
-        exp->literal = s;
+        exp->type = VARIABLE;
+        exp->variable = "\\Sigma";
         return exp;
     }
 
+    set* s = create_set();
     if(tk.type != SET_START){
         print_parser_error("'\\{'",&tk);
         return 0;

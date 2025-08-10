@@ -4,12 +4,21 @@
 #include <string.h>
 
 char* repeat(char ch, int repeat){
-    char* str = malloc(sizeof(char)*(repeat+1));
-    for(int i = 0; i<repeat; i++){
-        str[i] = ch;
+    if (repeat <= 0) {
+        char* empty = malloc(1);
+        if (empty) empty[0] = '\0';
+        return empty;
     }
+    char* str = malloc(sizeof(char)*(repeat+1));
+    if (str == NULL) return NULL;
+    memset(str, ch, repeat);
     str[repeat] = '\0';
     return str;
+}
+void append_str_raw(char** dest, const char* str){
+    size_t len = strlen(str);
+    memcpy(*dest, str, len);
+    *dest += len;
 }
 
 void append_str(char** dest, const char* fmt, ...){
@@ -17,17 +26,21 @@ void append_str(char** dest, const char* fmt, ...){
     va_start(args, fmt);
 
     char* temp;
-    vasprintf(&temp, fmt, args);
+    int len = vasprintf(&temp, fmt, args);
+    if (len == -1) return; 
     va_end(args);
 
     if (*dest == NULL) {
         *dest = temp;
     } else {
-        char* new_str;
-        asprintf(&new_str, "%s%s", *dest, temp);
-        free(*dest);
+        size_t old_len = strlen(*dest);
+        char* new_str = realloc(*dest, old_len + len + 1);
+        if (!new_str) {
+            free(temp);
+            return;
+        }
+        memcpy(new_str + old_len, temp, len + 1);
         free(temp);
         *dest = new_str;
     }
-
 }
