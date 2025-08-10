@@ -60,7 +60,7 @@ tape* create_tape(const string_list* values){
     t->content = values->data[0];
     for(size_t i = 1; i<values->index; i++){
         move_tape(&t, ACTION_RIGHT);
-        t->content = values->data[1];
+        t->content = values->data[i];
     }
     return head;
 }

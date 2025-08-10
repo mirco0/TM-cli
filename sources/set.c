@@ -18,6 +18,7 @@ int set_insert(set *s, char *data){
 }
 
 int set_contains(set *s, const char *element){
+    if(s == NULL) return 0;
     return ht_get(s,element) == EXISTS;
 }
 

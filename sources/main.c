@@ -3,9 +3,9 @@
 #include "../headers/parser/parser.h"
 #include "../headers/file_io.h"
 #include "../headers/engine/turing_engine.h"
-#include "../headers/set.h"
+#include "../headers/engine/environment.h"
 #include <stddef.h>
-#include <stdio.h>
+#include <stdlib.h>
 
 int main(){
 
@@ -26,9 +26,10 @@ int main(){
 
     context* ctx = create_context();
     interpret_program(ctx, exp);
-    
+
     tm_state* tm_machine;
-    init_engine(&tm_machine);
+    init_engine(&tm_machine,NULL);
+    printf("%sState: q0\n",tape_to_string(tm_machine->tape));
     execute(ctx, tm_machine);
 
 }
