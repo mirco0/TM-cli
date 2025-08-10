@@ -44,6 +44,7 @@ void execute(const context* context, tm_state* machine){
     set* final_states = context_get_variabile(context,"QF"); 
     if(set_contains(final_states,machine->state)){
         printf("Final state termination!.\n");
+        return;
     }
     
     if(machine->steps < machine->max_steps && strcmp(machine->state,"qF")){

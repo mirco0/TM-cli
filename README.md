@@ -14,6 +14,8 @@ $$
 \end{align*}
 $$
 
+## How to use
+You can find a guide on how to use the TM-CLI[here](HOW_TO.md)
 ## Features
 The parser is almost complete, but some features are still missing:
 
@@ -24,9 +26,9 @@ The parser is almost complete, but some features are still missing:
 - [x] **Comment support** via `%`
 - [x] Comment support at end-of-line (inline)
 
-- [ ] Turing Machine execution engine
+- [x] Turing Machine execution engine (work in progress)
 
-- [ ] Terminal visualization of tape and current state
+- [x] Terminal visualization of tape and current state (work in progress)
 
 - [ ] Step-by-step execution mode with debug output
 
