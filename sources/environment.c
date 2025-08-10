@@ -2,6 +2,7 @@
 #include "../headers/utils.h"
 #include "../headers/parser/expression.h"
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -29,8 +30,9 @@ void* context_get_variabile(const context* context, char* name){
 }
 
 int context_define_instruction(const context* context, expression* exp){
-    char* key = malloc(sizeof(char)*(strlen(exp->instruction.read)+strlen(exp->instruction.state)+2));
-    append_str(&key,"%s %s",exp->instruction.read,exp->instruction.state);            
+    int key_len = strlen(exp->instruction.read)+strlen(exp->instruction.state)+2;
+    char* key = malloc(sizeof(char)*key_len);
+    snprintf(key,key_len,"%s %s",exp->instruction.read,exp->instruction.state);            
 
     instruction_expression* instr_copy = malloc(sizeof(*instr_copy));
     *instr_copy = exp->instruction;
@@ -41,8 +43,9 @@ int context_define_instruction(const context* context, expression* exp){
 }
 
 instruction_expression* context_get_instruction(const context* context, char* state, char* read){
-    char* read_state = malloc(sizeof(char)*(strlen(read)+strlen(state)+2));
-    append_str(&read_state,"%s %s",read,state);
+    int len = strlen(read)+strlen(state)+2;
+    char* read_state = malloc(sizeof(char)*len);
+    snprintf(read_state,len,"%s %s",read,state);
     return ht_get(context->instructions_table,read_state);
 }
 

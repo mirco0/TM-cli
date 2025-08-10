@@ -21,26 +21,5 @@ void append_str_raw(char** dest, const char* str){
     *dest += len;
 }
 
-void append_str(char** dest, const char* fmt, ...){
-    va_list args;
-    va_start(args, fmt);
-
-    char* temp;
-    int len = vasprintf(&temp, fmt, args);
-    if (len == -1) return; 
-    va_end(args);
-
-    if (*dest == NULL) {
-        *dest = temp;
-    } else {
-        size_t old_len = strlen(*dest);
-        char* new_str = realloc(*dest, old_len + len + 1);
-        if (!new_str) {
-            free(temp);
-            return;
-        }
-        memcpy(new_str + old_len, temp, len + 1);
-        free(temp);
-        *dest = new_str;
-    }
-}
+// Removed buggy implementation TODO: da rifare
+void append_str(char** dest, const char* fmt, ...);

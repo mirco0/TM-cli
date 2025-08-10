@@ -4,10 +4,11 @@
 #include "../headers/file_io.h"
 #include "../headers/engine/turing_engine.h"
 #include "../headers/engine/environment.h"
+#include "../headers/utils.h"
 #include <stddef.h>
 #include <stdlib.h>
 
-int main(){
+int main(int argv, char** argc){
 
     file_context* f_context = 0;
     token_list* tokens = 0;
@@ -28,8 +29,18 @@ int main(){
     interpret_program(ctx, exp);
 
     tm_state* tm_machine;
-    init_engine(&tm_machine,NULL);
-    printf("%sState: q0\n",tape_to_string(tm_machine->tape));
-    execute(ctx, tm_machine);
 
+    //Input temporaneo: TODO: cli arguments
+    string_list* l;
+    string_list_create(&l);
+    
+    for (int i = 0; argc[1][i] != '\0'; i++) {
+        char* str = calloc(2,sizeof(char));
+        str[0] = argc[1][i];
+        string_list_add(l, str);    
+    }
+
+    init_engine(&tm_machine,l);
+
+    execute(ctx, tm_machine);
 }
