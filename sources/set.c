@@ -1,5 +1,6 @@
 #include "../headers/set.h"
 #include "../headers/hashtable.h"
+#include "../headers/list.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -24,24 +25,21 @@ set* set_union(set* a, set* b){
     hti iter_a = ht_iterator(a);
     hti iter_b = ht_iterator(b);
     hashtable* ht = ht_create();
-    set* s = malloc(sizeof(set));
     while(ht_next(&iter_a)){
-        ht_set(ht,iter_a.key,iter_a.value);
+        ht_set(ht,iter_a.key,EXISTS);
     }
     
     while(ht_next(&iter_b)){
         ht_set(ht,iter_b.key,EXISTS);
     }
     
-    s = ht;
-    return s;
+    return ht;
 }
 
 set* set_intersection(set* a, set* b){
     hti iter_a = ht_iterator(a);
     hti iter_b = ht_iterator(b);
     hashtable* ht = ht_create();
-    set* s = malloc(sizeof(set));
     
     while(ht_next(&iter_a)){
         if(set_contains(b,iter_a.key)){
@@ -55,14 +53,12 @@ set* set_intersection(set* a, set* b){
         }
     }
     
-    s = ht;
-    return s;
+    return ht;
 }
 
 set* set_difference(set* a, set* b){
     hti iter_a = ht_iterator(a);
     hashtable* ht = ht_create();
-    set* s = malloc(sizeof(set));
     
     while(ht_next(&iter_a)){
         if(!set_contains(b, iter_a.key)){
@@ -70,8 +66,31 @@ set* set_difference(set* a, set* b){
         }
     }
 
-    s = ht;
-    return s;
+    return ht;
+}
+
+set* set_copy(set* s){
+    hti iter = ht_iterator(s);
+    hashtable* ht = ht_create();
+    while(ht_next(&iter)){
+        ht_set(ht,iter.key,EXISTS);
+    }
+    return ht;
+}
+
+string_list* set_to_list(set* s){
+    if(s == NULL) return NULL;
+    string_list* list;
+    if(!string_list_create(&list)){
+        return NULL;
+    }
+    
+    hti iter = ht_iterator(s);
+    while(ht_next(&iter)){
+        char* value = strdup(iter.key);
+        string_list_add(list, value);
+    }
+    return list;
 }
 
 char* set_to_string(set* s){
