@@ -13,7 +13,7 @@ typedef struct {
     size_t max_steps;
 } tm_state;
 
-int init_engine(tm_state** machine);
+int init_engine(tm_state** machine, string_list* input);
 void execute(const context* instructions, tm_state* machine);
 set* evaluate(const context* context, expression* exp);
 set* eval_binary(const context* context, expression* exp);

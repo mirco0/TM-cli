@@ -9,7 +9,7 @@
 
 // TODO: AGGIUNGERE CALLBACK PER GESTIONE DI ERRORI RUNTIME
 
-int init_engine(tm_state** machine){
+int init_engine(tm_state** machine, string_list* input){
     //TODO: aggiungere stringa di input
     if(machine == NULL){
         return 0;
@@ -22,7 +22,7 @@ int init_engine(tm_state** machine){
     // Stato di partenza personalizzato
     // MAX_STEPS personalizzati
     (*machine)->state = "q0";
-    (*machine)->tape = create_empty_tape();
+    (*machine)->tape = create_tape(input);
     (*machine)->max_steps = 1300;
     (*machine)->steps = 0;
     return 1;
@@ -32,12 +32,20 @@ void execute(const context* context, tm_state* machine){
 
     instruction_expression* instr = context_get_instruction(context, machine->state,machine->tape->content);
     if(instr == NULL) return;
+    
     machine->tape->content = instr->write;
     move_tape(&machine->tape,instr->move);
     machine->state = instr->state2;
     machine->steps++;
+    
     printf("%s",tape_to_string(machine->tape));
     printf("State: %s\n\n",machine->state);
+
+    set* final_states = context_get_variabile(context,"QF"); 
+    if(set_contains(final_states,machine->state)){
+        printf("Final state termination!.\n");
+    }
+    
     if(machine->steps < machine->max_steps && strcmp(machine->state,"qF")){
         execute(context,machine);
     }
