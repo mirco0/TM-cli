@@ -1,5 +1,6 @@
 #include "../headers/list.h"
 #include "../headers/token.h"
+#include "../headers/parser/expression.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -141,7 +142,7 @@ int expression_list_add(expression_list* list, struct expression* expression){
 void destroy_expression_list(expression_list* list){
     if(list == NULL) return;
     for(size_t i = 0; i<list->index; i++){
-        free(list->data[i]);
+        destroy_expression(list->data[i]);
     }
     free(list->data);
     free(list);

@@ -19,7 +19,7 @@ typedef enum {
 
 typedef set* literal_expression; 
 typedef char* variable_expression;
-typedef expression_list program_expression;
+typedef expression_list* program_expression;
 
 typedef struct instruction {
     char* state;
@@ -58,5 +58,6 @@ char* expression_to_string(expression* exp,int indent);
 expression* expression_binary_simplify(expression* exp);
 expression* expression_compress(expression* exp);
 expression* expression_define(expression* exp);
+void destroy_expression(expression* expression);
 
 #endif

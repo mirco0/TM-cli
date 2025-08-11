@@ -16,11 +16,10 @@ typedef struct {
 int init_engine(tm_state** machine, string_list* input);
 void execute(const context* instructions, tm_state* machine);
 void destroy_engine_context(tm_state* machine, context* context);
-set* evaluate(const context* context, expression* exp);
-set* eval_binary(const context* context, expression* exp);
-void set_variable_expression(context* context, expression* expression);
-void interpret_program(context* context, expression* program);
-void evaluate_instructions(const context* context, expression* exp);
+set* evaluate(const context* context, const expression* exp);
+set* eval_binary(const context* context, const expression* exp);
+void interpret_program(context* context, const expression* program);
+void evaluate_instructions(const context* context, const expression* exp);
 int next_combination(char** dest, string_list* set, int num_variables, int iteration);
 
 #endif

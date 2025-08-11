@@ -59,7 +59,7 @@ void destroy_engine_context(tm_state* machine, context* context){
     destroy_context(context);
 }
 
-set* eval_binary(const context* context, expression* exp){
+set* eval_binary(const context* context, const expression* exp){
     set* left = evaluate(context,exp->binary.left);
     set* right = evaluate(context,exp->binary.right);
     
@@ -78,7 +78,7 @@ set* eval_binary(const context* context, expression* exp){
     }
 }
 
-set* evaluate(const context* context, expression* exp){
+set* evaluate(const context* context, const expression* exp){
     switch (exp->type) {
         case VARIABLE:
             return ht_get(context->table,exp->variable);
@@ -91,12 +91,12 @@ set* evaluate(const context* context, expression* exp){
     }
 }
 
-void interpret_program(context* context, expression* program){
+void interpret_program(context* context, const expression* program){
     
     if (!program || program->type != PROGRAM) return;
 
-    for (size_t i = 0; i < program->program.index; ++i) {
-        expression* exp = program->program.data[i];
+    for (size_t i = 0; i < program->program->index; ++i) {
+        expression* exp = program->program->data[i];
 
         if (exp->type == BINARY && exp->binary.operator.type == ASSIGN) {
             
@@ -112,7 +112,8 @@ void interpret_program(context* context, expression* program){
     }
 }
 
-void evaluate_instructions(const context* context, expression* exp){
+void evaluate_instructions(const context* context, const expression* exp){
+    // return;
     instruction_expression ex = exp->instruction;
     if(ex.quantifier){
         //TODO: FARE FREE
@@ -122,7 +123,6 @@ void evaluate_instructions(const context* context, expression* exp){
 
         expression* iter_expression = malloc(sizeof(expression));
         iter_expression->type = INSTRUCTION;
-
         int it = 0;
         set *s = evaluate(context,exp->instruction.quantifier->binary.right);
         while(next_combination(variables_value,set_to_list(s),variables->index,it)){
@@ -150,6 +150,7 @@ void evaluate_instructions(const context* context, expression* exp){
             }
             context_define_instruction(context, iter_expression);
         };
+        destroy_expression(iter_expression);
     }else{
         context_define_instruction(context, exp);
     }

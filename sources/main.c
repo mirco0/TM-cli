@@ -27,6 +27,7 @@ int main(int argv, char** argc){
 
     context* ctx = create_context();
     interpret_program(ctx, exp);
+    destroy_expression(exp);
 
     tm_state* tm_machine;
 

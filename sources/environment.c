@@ -29,12 +29,12 @@ void* context_get_variabile(const context* context, char* name){
     return ht_get(context->table,name);
 }
 
-int context_define_instruction(const context* context, expression* exp){
+int context_define_instruction(const context* context, const expression* exp){
     int key_len = strlen(exp->instruction.read)+strlen(exp->instruction.state)+2;
     char* key = malloc(sizeof(char)*key_len);
     snprintf(key,key_len,"%s %s",exp->instruction.read,exp->instruction.state);            
 
-    instruction_expression* instr_copy = malloc(sizeof(*instr_copy));
+    instruction_expression* instr_copy = malloc(sizeof(instruction_expression));
     *instr_copy = exp->instruction;
     
     const char* res = ht_set(context->instructions_table, key, instr_copy);

@@ -25,7 +25,7 @@ expression* parse_variables(token_list* tokens, size_t* start);
 
 expression* new_binary_expression();
 
-void print_parser_error(char* expected,const token* tk);
+void print_parser_error(char* expected, const token* tk);
 // instruction* parse_instructions(char* string, size_t string_size, size_t* arr_size);
 // char* stringify_instructions(instruction* instructions, size_t instructions_size);
 

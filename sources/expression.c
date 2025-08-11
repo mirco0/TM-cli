@@ -10,7 +10,7 @@ void print_expression(const expression* exp){
 
 //TODO: RISCRIVERE
 char* expression_to_string(expression* exp, int indent){
-    char* str = malloc(sizeof(char)*1000);
+    char* str;
     if(exp == NULL){
         asprintf(&str,"Empty expression.");
         return str;
@@ -80,8 +80,8 @@ char* expression_to_string(expression* exp, int indent){
         case PROGRAM:
 
             asprintf(&str,"%sProgram:\n%s",ANSI_COLOR_CYAN,ANSI_COLOR_RESET);
-            for(size_t i = 0; i<exp->program.index; i++){
-                asprintf(&str,"%s%s\n",str,expression_to_string((exp->program.data[i]),indent));
+            for(size_t i = 0; i<exp->program->index; i++){
+                asprintf(&str,"%s%s\n",str,expression_to_string((exp->program->data[i]),indent));
             }
             free(inner_indent_str);
             free(parent_indent_str);
@@ -99,6 +99,46 @@ char* expression_to_string(expression* exp, int indent){
 
 }
 
+void destroy_expression(expression* expression){
+    // Approccio ricorsivo
+
+    if(expression == NULL) return;
+
+    switch (expression->type) {
+        case BINARY:
+            destroy_expression(expression->binary.left);
+            destroy_expression(expression->binary.right);
+            break;
+        
+        case LITERAL:
+            ht_destroy(expression->literal);
+            break;
+
+        // char* che non dovrebbero essere allocati dinamicamente
+        case VARIABLE:
+            break;
+
+        case INSTRUCTION:
+            // char* state; char* read; char* write; char* state2 non dovrebbero essere allocati dinamicamente
+            // printf("QTF: %d\n",expression->instruction.quantifier == NULL);
+            destroy_expression(expression->instruction.quantifier);
+            break;
+
+        case PROGRAM:
+            // printf("expr list: %p\n",expression->program);
+            destroy_expression_list(expression->program);
+            break;
+        
+        //Non ancora implementato
+        case GROUP:
+            break;
+        
+        default:        
+            printf("Unknown state!\n");
+            return;
+    }
+    free(expression);
+}
 //TODO: Valutare se rimuovere in favore di eval (turing_engine.h)
 //Operazioni di semplificazioni (ottimizzazioni) dell'albero nella fase di parsing 
 expression* expression_binary_simplify(expression* exp){
@@ -140,8 +180,8 @@ expression* expression_compress(expression* exp){
     if(exp == NULL) return exp;
     switch (exp->type) {
         case PROGRAM:
-            for(int i = 0; i<exp->program.index; i++){
-                exp->program.data[i] = expression_compress(exp->program.data[i]);
+            for(int i = 0; i<exp->program->index; i++){
+                exp->program->data[i] = expression_compress(exp->program->data[i]);
             }
             return exp;
             break;

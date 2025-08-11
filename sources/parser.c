@@ -82,7 +82,7 @@ expression* parse_statement(token_list* tokens,size_t *start){
         printf("Unexpected token: '%s'.\n",token_to_string(peek(tokens, *start)));
         return 0;
     }
-    exp->program = *exp_list;
+    exp->program = exp_list;
     return exp;
 }
 

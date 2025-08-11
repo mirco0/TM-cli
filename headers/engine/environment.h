@@ -20,7 +20,7 @@ typedef struct cell tape;
 context* create_context();
 int context_define_variable(context* context, char* name, void* value);
 void* context_get_variabile(const context* context, char* name);
-int context_define_instruction(const context* context, expression* instruction_expression);
+int context_define_instruction(const context* context, const expression* instruction_expression);
 instruction_expression* context_get_instruction(const context* context, char* state, char* read);
 void destroy_context(context* context);
 
