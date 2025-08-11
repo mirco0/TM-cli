@@ -53,6 +53,12 @@ void execute(const context* context, tm_state* machine){
 
 }
 
+void destroy_engine_context(tm_state* machine, context* context){
+    if(machine == NULL) return;
+    destroy_tape(machine->tape);
+    destroy_context(context);
+}
+
 set* eval_binary(const context* context, expression* exp){
     set* left = evaluate(context,exp->binary.left);
     set* right = evaluate(context,exp->binary.right);

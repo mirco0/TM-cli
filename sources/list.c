@@ -1,5 +1,6 @@
 #include "../headers/list.h"
 #include "../headers/token.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -43,6 +44,12 @@ int print_token_list(token_list* list){
     return 0;
 }
 
+void destroy_token_list(token_list* list){
+    if(list == NULL) return;
+    free(list->data);
+    free(list);
+}
+
 
 int string_list_create(string_list** list){
     *list = malloc(sizeof(string_list));
@@ -55,7 +62,7 @@ int string_list_create(string_list** list){
     return 1;
 }
 
-
+/*String must be allocated, will be freed on destroy*/
 int string_list_add(string_list* list, char* string){
     if(list->capacity <= list->index){
         if(list->capacity > list->capacity*2){
@@ -87,6 +94,15 @@ int print_string_list(string_list* list){
     return 0;
 }
 
+void destroy_string_list(string_list* list){
+    if(list == NULL) return;
+    for(size_t i = 0; i<list->index; i++){
+        free(list->data[i]);
+    }
+    free(list->data);
+    free(list);
+}
+
 
 int expression_list_create(expression_list** list){
     *list = malloc(sizeof(expression_list));
@@ -99,7 +115,7 @@ int expression_list_create(expression_list** list){
     return 1;
 }
 
-
+/* expression must be allocated, will be freed on destroy */
 int expression_list_add(expression_list* list, struct expression* expression){
     if(list->capacity <= list->index){
         if(list->capacity > list->capacity*2){
@@ -120,4 +136,13 @@ int expression_list_add(expression_list* list, struct expression* expression){
     }
     list->data[list->index++] = expression;
     return 1;
+}
+
+void destroy_expression_list(expression_list* list){
+    if(list == NULL) return;
+    for(size_t i = 0; i<list->index; i++){
+        free(list->data[i]);
+    }
+    free(list->data);
+    free(list);
 }

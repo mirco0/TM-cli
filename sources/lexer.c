@@ -139,6 +139,9 @@ int create_lexing_info(lexing_info** info){
     return 1;
 }
 
+void destroy_lexing_info(lexing_info* info){
+    free(info);
+}
 
 
 

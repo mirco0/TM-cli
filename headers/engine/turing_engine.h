@@ -15,6 +15,7 @@ typedef struct {
 
 int init_engine(tm_state** machine, string_list* input);
 void execute(const context* instructions, tm_state* machine);
+void destroy_engine_context(tm_state* machine, context* context);
 set* evaluate(const context* context, expression* exp);
 set* eval_binary(const context* context, expression* exp);
 void set_variable_expression(context* context, expression* expression);

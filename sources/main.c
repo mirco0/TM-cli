@@ -4,7 +4,6 @@
 #include "../headers/file_io.h"
 #include "../headers/engine/turing_engine.h"
 #include "../headers/engine/environment.h"
-#include "../headers/utils.h"
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -22,6 +21,7 @@ int main(int argv, char** argc){
         tokenize(str, 1024,&tokens,info);
     }
     write_end(tokens,info);
+    context_file_close(f_context);
 
     expression* exp = parse(tokens);
 
@@ -41,6 +41,11 @@ int main(int argv, char** argc){
     }
 
     init_engine(&tm_machine,l);
+    destroy_string_list(l);
+
+    printf("%s",tape_to_string(tm_machine->tape));
+    printf("State: %s\n\n",tm_machine->state);
 
     execute(ctx, tm_machine);
+    destroy_engine_context(tm_machine,ctx);
 }

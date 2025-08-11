@@ -49,6 +49,12 @@ instruction_expression* context_get_instruction(const context* context, char* st
     return ht_get(context->instructions_table,read_state);
 }
 
+void destroy_context(context *context){
+    if (context == NULL) return; 
+    ht_destroy(context->table);
+    ht_destroy(context->instructions_table);
+    free(context);
+}
 
 tape* create_empty_tape(){
     tape* t = calloc(sizeof(tape),1);
@@ -60,10 +66,10 @@ tape* create_tape(const string_list* values){
     tape* t = create_empty_tape();
     if(values == NULL) return t;
     tape* head = t;
-    t->content = values->data[0];
+    t->content = strdup(values->data[0]);
     for(size_t i = 1; i<values->index; i++){
         move_tape(&t, ACTION_RIGHT);
-        t->content = values->data[i];
+        t->content = strdup(values->data[i]);
     }
     return head;
 }
@@ -145,4 +151,17 @@ char* tape_to_string(const tape* t) {
     *p = '\0';
     free(widths);
     return out;
+}
+
+void destroy_tape(tape* tape){
+    if(tape == NULL) return;
+    while(tape->prev != NULL){
+        tape = tape->prev;
+    }
+
+    while(tape->next != NULL){
+        tape = tape->next;
+        free(tape->prev);
+    }
+    free(tape);
 }

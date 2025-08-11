@@ -44,9 +44,10 @@ int read_next_chunk(file_context* context, char* buffer, size_t buffer_size){
     return 0;
 }
 
-void context_file_close(file_context** context){
-    free(*context);
-    fclose((*context)->fp);
+void context_file_close(file_context* context){
+    if (context == NULL) return;
+    fclose(context->fp);
+    free(context);
 }
 
 char* read_around(file_context* context, int index, int radius){
