@@ -2,6 +2,7 @@
 #include "../headers/utils.h"
 
 #include <stddef.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,33 +12,35 @@ void print_expression(const expression* exp){
 
 //TODO: RISCRIVERE
 char* expression_to_string(expression* exp, int indent){
-    char* str;
     if(exp == NULL){
-        asprintf(&str,"Empty expression.");
-        return str;
+        return strdup("Empty expression.");
     }
+    char* str;
     
     char* inner_indent_str = repeat('\t',indent);
     char* parent_indent_str = repeat('\t',indent-1);
     
     switch (exp->type) {
         case INSTRUCTION:
-            asprintf(&str,"%sInstruction%s \n%sData: <%s,%s,%s,%s,%s>\n%sQuantifier: (%s).",
-                ANSI_COLOR_RED,
-                ANSI_COLOR_RESET,
-                inner_indent_str,
-                exp->instruction.state,
-                exp->instruction.read,
-                exp->instruction.write,
-                exp->instruction.state2,
-                TOKEN_TYPES_[exp->instruction.move],
-                inner_indent_str,
-                expression_to_string(exp->instruction.quantifier,indent+1)
-            );
-            free(inner_indent_str);
-            free(parent_indent_str);
-            return str;
-
+            {
+                char* quantifier_str = expression_to_string(exp->instruction.quantifier,indent+1);
+                asprintf(&str,"%sInstruction%s \n%sData: <%s,%s,%s,%s,%s>\n%sQuantifier: (%s).",
+                    ANSI_COLOR_RED,
+                    ANSI_COLOR_RESET,
+                    inner_indent_str,
+                    exp->instruction.state,
+                    exp->instruction.read,
+                    exp->instruction.write,
+                    exp->instruction.state2,
+                    TOKEN_TYPES_[exp->instruction.move],
+                    inner_indent_str,
+                    quantifier_str
+                );
+                free(inner_indent_str);
+                free(parent_indent_str);
+                free(quantifier_str);
+                return str;
+            }
         case BINARY:
             {
                 char* left_str = expression_to_string(exp->binary.left,indent+1);
@@ -81,17 +84,18 @@ char* expression_to_string(expression* exp, int indent){
             return str;
     
         case PROGRAM:
-
             asprintf(&str,"%sProgram:\n%s",ANSI_COLOR_CYAN,ANSI_COLOR_RESET);
             for(size_t i = 0; i<exp->program->index; i++){
-                asprintf(&str,"%s%s\n",str,expression_to_string((exp->program->data[i]),indent));
+                char* exp_str = expression_to_string(exp->program->data[i],indent);
+                asprintf(&str,"%s%s\n",str,exp_str);
+                free(exp_str);
             }
             free(inner_indent_str);
             free(parent_indent_str);
             return str;
 
-        default: 
-            asprintf(&str,"Unknown expression.");
+        default:
+            str = strdup("Unknown expression.");
             free(inner_indent_str);
             free(parent_indent_str);
             return str;

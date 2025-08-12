@@ -1,7 +1,8 @@
 #include "../headers/token.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include "../headers/utils.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 const char* TOKEN_TYPES_[] = {
     "EOF",
@@ -32,19 +33,19 @@ const char* TOKEN_TYPES_[] = {
 };
 
 char* token_to_string(const token* token_item){
-    char* str;
     if(token_item == NULL){
-        asprintf(&str,"NULL TOKEN.");    
+        return strdup("NULL TOKEN.");    
     }
+    char* str;
     asprintf(&str,"(%s,%s,%zd,%d,%d)",TOKEN_TYPES_[token_item->type], token_item->data, token_item->data_size,token_item->line_num,token_item->char_num);
     return str;
 }
 
 char* error_token_to_string(const token* token_item){
-    char* str;
     if(token_item == NULL){
-        asprintf(&str,"NULL TOKEN.");    
+        return strdup("NULL TOKEN.");    
     }
+    char* str;
     asprintf(&str,"%sError%s:%d:%d '%s'",
         ANSI_BOLD,
         ANSI_COLOR_RESET,
