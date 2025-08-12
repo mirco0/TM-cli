@@ -39,39 +39,41 @@ char* expression_to_string(expression* exp, int indent){
             return str;
 
         case BINARY:
-            char* left_str = expression_to_string(exp->binary.left,indent+1);
-            char* oper_str = token_to_string(&exp->binary.operator);
-            char* right_str = expression_to_string(exp->binary.right,indent+1);
-            
-            asprintf(&str,"%sBinary%s %s\n%sA: (%s),\n%sB: (%s).\n%s",
-                ANSI_COLOR_YELLOW,
-                ANSI_COLOR_RESET,
-                oper_str,
-                inner_indent_str,
-                left_str,
-                inner_indent_str,
-                right_str,
-                parent_indent_str
-            );
-            free(inner_indent_str);
-            free(parent_indent_str);
-            free(left_str);
-            free(oper_str);
-            free(right_str);
-            return str;
-
+            {
+                char* left_str = expression_to_string(exp->binary.left,indent+1);
+                char* oper_str = token_to_string(&exp->binary.operator);
+                char* right_str = expression_to_string(exp->binary.right,indent+1);
+                
+                asprintf(&str,"%sBinary%s %s\n%sA: (%s),\n%sB: (%s).\n%s",
+                    ANSI_COLOR_YELLOW,
+                    ANSI_COLOR_RESET,
+                    oper_str,
+                    inner_indent_str,
+                    left_str,
+                    inner_indent_str,
+                    right_str,
+                    parent_indent_str
+                );
+                free(inner_indent_str);
+                free(parent_indent_str);
+                free(left_str);
+                free(oper_str);
+                free(right_str);
+                return str;
+            }
         case LITERAL:
-            char* set_str = set_to_string(exp->literal); 
-            asprintf(&str,"%sLiteral%s %s",
-                ANSI_COLOR_MAGENTA,
-                ANSI_COLOR_RESET,
-                set_str
-            );
-            free(inner_indent_str);
-            free(parent_indent_str);
-            free(set_str);
-            return str;
-            
+            {
+                char* set_str = set_to_string(exp->literal); 
+                asprintf(&str,"%sLiteral%s %s",
+                    ANSI_COLOR_MAGENTA,
+                    ANSI_COLOR_RESET,
+                    set_str
+                );
+                free(inner_indent_str);
+                free(parent_indent_str);
+                free(set_str);
+                return str;
+            }            
         case VARIABLE:
             asprintf(&str,"%sVariable%s %s",ANSI_COLOR_GREEN,ANSI_COLOR_RESET,exp->variable);
             free(inner_indent_str);
