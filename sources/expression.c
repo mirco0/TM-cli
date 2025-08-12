@@ -1,6 +1,7 @@
 #include "../headers/parser/expression.h"
 #include "../headers/utils.h"
 
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -120,12 +121,10 @@ void destroy_expression(expression* expression){
 
         case INSTRUCTION:
             // char* state; char* read; char* write; char* state2 non dovrebbero essere allocati dinamicamente
-            // printf("QTF: %d\n",expression->instruction.quantifier == NULL);
             destroy_expression(expression->instruction.quantifier);
             break;
 
         case PROGRAM:
-            // printf("expr list: %p\n",expression->program);
             destroy_expression_list(expression->program);
             break;
         
@@ -139,6 +138,104 @@ void destroy_expression(expression* expression){
     }
     free(expression);
 }
+
+expression* expression_binary_create(token operator, expression* left, expression* right){
+    expression* exp = calloc(1,sizeof(expression));
+    if(exp == NULL) return NULL;
+    exp->type = BINARY;
+    exp->binary.operator = operator;
+    exp->binary.left = left;
+    exp->binary.right = right;
+    return exp;
+}
+
+expression* expression_literal_create(){
+    expression* exp = calloc(1,sizeof(expression));
+    if(exp == NULL) return NULL;
+    exp->type = LITERAL;
+    exp->literal = create_set();
+    return exp;
+}
+
+expression* expression_variable_create(variable_expression variable){
+    expression* exp = calloc(1,sizeof(expression));
+    if(exp == NULL) return NULL;
+    exp->type = VARIABLE;
+    exp->variable = variable;
+    return exp;
+}
+
+expression* expression_instruction_create(char* state, char* read, char* write, char* state2, enum TOKEN_TYPE move, expression* quantifier){
+    expression* exp = calloc(1,sizeof(expression));
+    if(exp == NULL) return NULL;
+    exp->type = INSTRUCTION;
+    exp->instruction.state  = state;
+    exp->instruction.read   = read;
+    exp->instruction.write  = write;
+    exp->instruction.state2 = state2;
+    exp->instruction.move   = move;
+    exp->instruction.quantifier = quantifier;
+    return exp;
+}
+
+expression* expression_program_create(){
+    expression* exp = calloc(1,sizeof(expression));
+    if(exp == NULL) return NULL;
+    exp->type = PROGRAM;
+    expression_list_create(&exp->program);
+    return exp;
+}
+
+expression* expression_group_create();
+
+//Copia ricorsiva e totale
+expression* expression_copy(expression* expression){
+    if(expression == NULL) return NULL;
+    switch (expression->type) {
+        case BINARY:
+            {
+                struct expression* left = expression_copy(expression->binary.left);
+                struct expression* right = expression_copy(expression->binary.right);
+                return expression_binary_create(expression->binary.operator, left, right);
+            }
+
+        case LITERAL:
+            {
+                struct expression* exp = expression_literal_create();
+                free(exp->literal);
+                exp->literal = set_copy(expression->literal);
+                return exp;
+            }
+
+        case VARIABLE:
+            return expression_variable_create(expression->variable);
+
+        case INSTRUCTION:
+            {
+                struct expression* quantifier = expression_copy(expression->instruction.quantifier);
+                return expression_instruction_create(expression->instruction.state, expression->instruction.read, expression->instruction.write, expression->instruction.state2, expression->instruction.move,quantifier);
+            }
+
+        case PROGRAM:
+            {
+                struct expression* exp = expression_program_create();
+                for(size_t i = 0; i<expression->program->index; i++){
+                    struct expression* item_copy = expression_copy(expression->program->data[i]);
+                    expression_list_add(exp->program,item_copy);
+                }
+                return exp;
+            }
+        
+        case GROUP:
+            return NULL;
+        
+        default:
+            return NULL;
+    }
+    return NULL;
+}
+
+
 //TODO: Valutare se rimuovere in favore di eval (turing_engine.h)
 //Operazioni di semplificazioni (ottimizzazioni) dell'albero nella fase di parsing 
 expression* expression_binary_simplify(expression* exp){

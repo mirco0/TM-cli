@@ -65,54 +65,48 @@ expression* parse(token_list* tokens){
 }
 
 expression* parse_statement(token_list* tokens,size_t *start){
-    expression* exp = calloc(1, sizeof(expression));
-    exp->type = PROGRAM;
-    expression_list* exp_list = 0;
-    expression_list_create(&exp_list);
+    expression* exp = expression_program_create();
     
     while(PEEK_TYPE == IDENTIFIER || PEEK_TYPE == SIGMA){
-        expression_list_add(exp_list,parse_assignment(tokens,start));
+        expression_list_add(exp->program,parse_assignment(tokens,start));
     }
     
     while(PEEK_TYPE == INSTRUCTION_START){
-        expression_list_add(exp_list,parse_instruction(tokens,start));
+        expression_list_add(exp->program,parse_instruction(tokens,start));
     }
 
     if(PEEK_TYPE != IDENTIFIER && PEEK_TYPE != SIGMA && PEEK_TYPE != INSTRUCTION_START && PEEK_TYPE != -1 && PEEK_TYPE != END_OF_FILE){
         printf("Unexpected token: '%s'.\n",token_to_string(peek(tokens, *start)));
+        destroy_expression(exp);
         return 0;
     }
-    exp->program = exp_list;
     return exp;
 }
 
 expression* parse_assignment(token_list* tokens,size_t* start){
-
-    expression* exp = calloc(1, sizeof(expression));
-    expression* sexp = calloc(1,sizeof(expression));
-
+    expression* sexp = expression_variable_create(NULL);
+    
     token tk;
     if(!MATCH(&tk,IDENTIFIER,SIGMA)){
         print_parser_error("IDENTIFIER or '\\Sigma'",&tk);
+        destroy_expression(sexp);
         return 0;
     }
-    sexp->type = VARIABLE;
     if(tk.data_size != 0){
         sexp->variable = tk.data;
     }else{
         sexp->variable = "\\Sigma";
     }
-
-    exp->type = BINARY;
-    exp->binary.left = sexp;
     
     if(!MATCH(&tk,ASSIGN)){
         print_parser_error("'='",&tk);
+        destroy_expression(sexp);
         return 0;
     }
 
-    exp->binary.operator = tk;
-    exp->binary.right = parse_set_op(tokens,start);
+    expression* right = parse_set_op(tokens,start);
+    expression* exp = expression_binary_create(tk, sexp, right);
+
     return exp;
 }
 
@@ -179,16 +173,8 @@ expression* parse_instruction(token_list* tokens,size_t* start){
         return 0;
     }
 
-
-    expression* exp = calloc(1,sizeof(expression));
-    exp->type = INSTRUCTION;
-    exp->instruction.state  = state;
-    exp->instruction.read   = read;
-    exp->instruction.write  = write;
-    exp->instruction.state2 = state2;
-    exp->instruction.move   = move;
-    exp->instruction.quantifier = 0;
-
+    expression* exp = expression_instruction_create(state, read, write, state2, move, NULL);
+    
     if (PEEK_TYPE == FORALL) {
         exp->instruction.quantifier = parse_domain(tokens, start);
     }
@@ -209,13 +195,8 @@ expression* parse_set_difference(token_list* tokens, size_t* start){
         
         expression* exp2 = exp;
         expression* right = parse_set_union(tokens,start);
-        
-        exp = calloc(1,sizeof(expression));
+        exp = expression_binary_create(tk,exp2, right);
 
-        exp->type = BINARY;
-        exp->binary.operator = tk;
-        exp->binary.left = exp2;
-        exp->binary.right = right;
     }
     return exp;
 
@@ -230,13 +211,8 @@ expression* parse_set_union(token_list* tokens, size_t* start){
 
         expression* exp2 = exp;
         expression* right = parse_set_intersection(tokens,start);
-        
-        exp = calloc(1,sizeof(expression));
+        exp = expression_binary_create(tk,exp2, right);
 
-        exp->type = BINARY;
-        exp->binary.operator = tk;
-        exp->binary.left = exp2;
-        exp->binary.right = right;
     }
     return exp;
 
@@ -251,13 +227,8 @@ expression* parse_set_intersection(token_list* tokens, size_t* start){
         
         expression* exp2 = exp;
         expression* right = parse_set_elements(tokens,start);
-        
-        exp = calloc(1,sizeof(expression));
+        exp = expression_binary_create(tk,exp2, right);
 
-        exp->type = BINARY;
-        exp->binary.operator = tk;
-        exp->binary.left = exp2;
-        exp->binary.right = right;
     }
     return exp;
 
@@ -266,51 +237,49 @@ expression* parse_set_intersection(token_list* tokens, size_t* start){
 expression* parse_set_elements(token_list* tokens, size_t* start){
 
     token tk = *consume(tokens,start);
-    expression* exp = calloc(1,sizeof(expression));
 
     if(tk.type == IDENTIFIER){
-        exp->type = VARIABLE;
-        exp->variable = tk.data;
+        expression* exp = expression_variable_create(tk.data);
         return exp;
     }
 
     if(tk.type == SIGMA){
-        exp->type = VARIABLE;
-        exp->variable = "\\Sigma";
+        expression* exp = expression_variable_create("\\Sigma");
         return exp;
     }
 
-    set* s = create_set();
+    expression* exp = expression_literal_create();
     if(tk.type != SET_START){
         print_parser_error("'\\{'",&tk);
+        destroy_expression(exp);
         return 0;
     }
+
     tk = *consume(tokens,start);
 
     if(tk.type != IDENTIFIER && tk.type != BLANK){
         print_parser_error("IDENTIFIER or BLANK after '\\{'",&tk);
+        destroy_expression(exp);
         return 0;
     }
     
-    set_insert(s,tk.data);
+    set_insert(exp->literal,tk.data);
     
     while(MATCH(&tk,COMMA)) {
         if(MATCH(&tk,IDENTIFIER,BLANK)){
-            set_insert(s,tk.data);
+            set_insert(exp->literal,tk.data);
         }else{
-            //Messaggio precedente "No IDENTIFIER or blank after ',', got %s"
             print_parser_error("IDENTIFIER or blank after ','", &tk);
+            destroy_expression(exp);
             return 0;
         }
     }
     if(tk.type != SET_END){
-
         print_parser_error("'\\}'",&tk);
+        destroy_expression(exp);
         return 0;
     }
 
-    exp->type = LITERAL;
-    exp->literal = s;
     return exp;
 }
 
@@ -322,14 +291,11 @@ expression* parse_domain(token_list* tokens, size_t* start){
         return 0;
     }
     
-    expression* exp = calloc(1, sizeof(expression));
-    exp->binary.operator = tk;
-    exp->type = BINARY;
-
-    exp->binary.left = parse_variables(tokens,start);
+    expression* exp = expression_binary_create(tk, parse_variables(tokens,start), NULL);
 
     if(!MATCH(&tk,IN)){
         print_parser_error("'\\in'",&tk);
+        destroy_expression(exp);
         exit(0);
         return 0;
     }
@@ -339,8 +305,7 @@ expression* parse_domain(token_list* tokens, size_t* start){
 }
 
 expression* parse_variables(token_list* tokens, size_t* start){
-    expression* exp = calloc(1,sizeof(expression));
-    set* s = create_set();
+    expression* exp = expression_literal_create();
     token tk;
 
     if(!MATCH(&tk,IDENTIFIER)) {
@@ -349,16 +314,14 @@ expression* parse_variables(token_list* tokens, size_t* start){
         return 0;
     }
     
-    set_insert(s, tk.data);
+    set_insert(exp->literal, tk.data);
     
     while(PEEK_TYPE == COMMA) {
         tk = *consume(tokens,start);
         if(MATCH(&tk,IDENTIFIER)){
-            set_insert(s,tk.data);
+            set_insert(exp->literal,tk.data);
         }
     }
-    exp->type = LITERAL;
-    exp->literal = s;
     return exp;
 }
 

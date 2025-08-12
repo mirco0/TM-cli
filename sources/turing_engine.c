@@ -113,7 +113,6 @@ void interpret_program(context* context, const expression* program){
 }
 
 void evaluate_instructions(const context* context, const expression* exp){
-    // return;
     instruction_expression ex = exp->instruction;
     if(ex.quantifier){
         //TODO: FARE FREE
@@ -127,7 +126,7 @@ void evaluate_instructions(const context* context, const expression* exp){
         set *s = evaluate(context,exp->instruction.quantifier->binary.right);
         while(next_combination(variables_value,set_to_list(s),variables->index,it)){
             it++;
-            //TODO: funzioni per creazione/duplicazione/distruzioni di espressioni
+            // No copy ne creazione per evitare continue allocazioni
             iter_expression->instruction.read = ex.read;
             iter_expression->instruction.write = ex.write;
             iter_expression->instruction.state = ex.state;
@@ -150,7 +149,6 @@ void evaluate_instructions(const context* context, const expression* exp){
             }
             context_define_instruction(context, iter_expression);
         };
-        destroy_expression(iter_expression);
     }else{
         context_define_instruction(context, exp);
     }

@@ -58,6 +58,15 @@ char* expression_to_string(expression* exp,int indent);
 expression* expression_binary_simplify(expression* exp);
 expression* expression_compress(expression* exp);
 expression* expression_define(expression* exp);
+
+expression* expression_binary_create(token operator, expression* left, expression* right);
+expression* expression_literal_create();
+expression* expression_variable_create(variable_expression variable);
+expression* expression_instruction_create(char* state, char* read, char* write, char* state2, enum TOKEN_TYPE move, expression* quantifier);
+expression* expression_program_create();
+expression* expression_group_create();
+expression* expression_copy(expression* expression);
+
 void destroy_expression(expression* expression);
 
 #endif
