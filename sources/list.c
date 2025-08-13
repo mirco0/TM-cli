@@ -17,6 +17,7 @@ int token_list_create(token_list** list){
 }
 
 int token_list_add(token_list* list, token token_item){
+    if(list == 0) return 0;
     if(list->capacity <= list->index){
         if(list->capacity > list->capacity*2){
             return 0;
@@ -65,6 +66,7 @@ int string_list_create(string_list** list){
 
 /*String must be allocated, will be freed on destroy*/
 int string_list_add(string_list* list, char* string){
+    if(list == 0) return 0;
     if(list->capacity <= list->index){
         if(list->capacity > list->capacity*2){
             return 0;
@@ -118,6 +120,7 @@ int expression_list_create(expression_list** list){
 
 /* expression must be allocated, will be freed on destroy */
 int expression_list_add(expression_list* list, struct expression* expression){
+    if(list == 0) return 0;
     if(list->capacity <= list->index){
         if(list->capacity > list->capacity*2){
             return 0;

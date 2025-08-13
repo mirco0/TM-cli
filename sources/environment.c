@@ -66,6 +66,7 @@ tape* create_tape(const string_list* values){
     tape* t = create_empty_tape();
     if(values == NULL) return t;
     tape* head = t;
+    if(values->index == 0) return head;
     t->content = strdup(values->data[0]);
     for(size_t i = 1; i<values->index; i++){
         move_tape(&t, ACTION_RIGHT);

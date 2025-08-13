@@ -126,8 +126,9 @@ int add_token(enum TOKEN_TYPE type,char* data, size_t data_size, token_list* tok
     return 0;
 }
 
-void write_end(token_list* tokens, const lexing_info* info){
-    add_token(END_OF_FILE,0,0,tokens,info);
+void write_end(token_list** tokens, const lexing_info* info){
+    if(*tokens == 0) token_list_create(tokens);
+    add_token(END_OF_FILE,0,0,*tokens,info);
 }
 
 int create_lexing_info(lexing_info** info){

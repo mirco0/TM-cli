@@ -20,7 +20,7 @@ int main(int argv, char** argc){
     while(read_next_chunk(f_context,str, 1024)){
         tokenize(str, 1024,&tokens,info);
     }
-    write_end(tokens,info);
+    write_end(&tokens,info);
     context_file_close(f_context);
 
     expression* exp = parse(tokens);
@@ -35,7 +35,7 @@ int main(int argv, char** argc){
     string_list* l;
     string_list_create(&l);
     
-    for (int i = 0; argc[1][i] != '\0'; i++) {
+    for (int i = 0; argv > 1 && argc[1][i] != '\0'; i++) {
         char* str = calloc(2,sizeof(char));
         str[0] = argc[1][i];
         string_list_add(l, str);    
